@@ -8,3 +8,45 @@
 .detail-panel li{margin:6px 0;line-height:1.5}
 .image-credit{font-size:11px;color:#9ca9a2;margin:14px 0}
 .image-credit a{color:#9ed8b7;text-decoration:underline}
+
+/* v1.2: readable typography, exact exercise media, fast video access */
+body{font-size:16px}
+.side-label,.eyebrow{font-size:11px;letter-spacing:1.5px}
+.nav-item{font-size:15px}
+.sidebar-card strong{font-size:15px}.sidebar-card p{font-size:13px}.text-link{font-size:13px}
+.topbar h1{font-size:29px}.today-pill{font-size:12px}
+.hero-kicker{font-size:11px}.hero-copy p{font-size:15px;line-height:1.7}
+.btn-primary,.btn-secondary{font-size:14px;padding:14px 18px}
+.section-head h2{font-size:27px}.section-head p{font-size:14px}
+.catalog-count span{font-size:10px}
+.search-box input{font-size:16px}.chip{font-size:13px;padding:9px 13px}
+.exercise-info{padding:15px}.exercise-info h3{font-size:16px;line-height:1.35}
+.exercise-info p{font-size:13px;line-height:1.5}
+.card-bottom{font-size:12px}
+.exercise-image{height:190px}
+.exercise-image img,.modal-image{background:#202d25;object-fit:cover}
+.image-pending{opacity:.55}
+.image-unavailable{object-fit:contain;padding:24px}
+.card-video-link{display:inline-flex;align-items:center;justify-content:center;margin:10px 0 8px;padding:10px 12px;min-height:40px;border-radius:9px;background:#c7f36b;color:#172019;text-decoration:none;font-weight:800;font-size:13px}
+.card-video-link:active{transform:scale(.98)}
+.modal-video-top{margin:0 0 12px}
+.video-link-primary{display:flex;justify-content:center;align-items:center;background:#c7f36b;color:#172019;text-decoration:none;font-size:14px;font-weight:900;padding:14px 16px;border-radius:10px}
+.modal-card h2{font-size:27px}
+.modal-card h4{font-size:14px}
+.modal-card p,.modal-card li{font-size:15px;line-height:1.75}
+.muscle-pills span{font-size:12px}
+.detail-panel h4{font-size:13px}.detail-panel p,.detail-panel li{font-size:14px}
+.image-credit{font-size:12px}
+.form-card label,.form-card input,.form-card select{font-size:15px}
+@media(max-width:700px){
+ .topbar h1{font-size:24px}.hero-copy p{font-size:15px}
+ .section-head h2{font-size:23px}.section-head p{font-size:13px}
+ .exercise-grid{grid-template-columns:1fr;gap:14px}
+ .exercise-image{height:210px}
+ .exercise-info{padding:14px}.exercise-info h3{font-size:17px}
+ .exercise-info p{font-size:14px}.card-video-link{font-size:14px;width:100%}
+ .card-bottom{font-size:12px}
+ .nav-item{font-size:11px}
+ .modal-card{padding:18px}.modal-card h2{font-size:24px}
+ .modal-card p,.modal-card li{font-size:15px}
+}
