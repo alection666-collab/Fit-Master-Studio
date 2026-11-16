@@ -7,19 +7,39 @@ const titles = {catalog:"Каталог тренажёров",builder:"Подб�
 function showTab(tab){$$(".tab-panel").forEach(x=>x.classList.toggle("active",x.id===tab));$$(".nav-item").forEach(x=>x.classList.toggle("active",x.dataset.tab===tab));$("#pageTitle").textContent=titles[tab];if(tab==="plan")renderPlan();window.scrollTo({top:0,behavior:"smooth"});}
 $$("[data-tab]").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.tab)));
 $$("[data-goto]").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.goto)));
+const imageCache = new Map();
+async function findExerciseImage(e){
+ if(imageCache.has(e.id))return imageCache.get(e.id);
+ const fallback=e.image && !e.image.includes("unsplash.com") ? e.image : "";
+ try{
+  const url="https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrnamespace=6&gsrsearch="+encodeURIComponent((e.imageQuery||e.name+" exercise demonstration")+" filetype:bitmap")+"&gsrlimit=1&prop=imageinfo&iiprop=url&iiurlwidth=900&format=json&origin=*";
+  const r=await fetch(url); if(!r.ok)throw new Error("Commons unavailable");
+  const j=await r.json(); const page=Object.values(j.query?.pages||{})[0];
+  const found=page?.imageinfo?.[0]?.thumburl||page?.imageinfo?.[0]?.url||fallback;
+  imageCache.set(e.id,found);return found;
+ }catch(_){imageCache.set(e.id,fallback);return fallback;}
+}
+function hydrateExerciseImages(root=document){
+ root.querySelectorAll("img[data-exercise-id]").forEach(async img=>{
+  const e=EXERCISES.find(x=>x.id===img.dataset.exerciseId);if(!e)return;
+  const src=await findExerciseImage(e);if(src&&img.isConnected){img.src=src;img.classList.remove("image-pending");}
+  else if(img.isConnected){img.alt="Фото упражнения пока недоступно";img.classList.add("image-unavailable");}
+ });
+}
 function renderCatalog(){
  const q=$("#searchInput").value.toLowerCase();
  const list=EXERCISES.filter(e=>(activeFilter==="all"||e.type===activeFilter)&&(`${e.name} ${e.machine} ${e.category} ${e.muscles.join(" ")}`).toLowerCase().includes(q));
  $("#catalogCount").textContent=list.length;
- $("#exerciseGrid").innerHTML=list.map(e=>`<article class="exercise-card" data-id="${e.id}"><div class="exercise-image"><img loading="lazy" src="${e.image}" alt="${e.name}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=900&q=80'"><span class="muscle-tag">${e.category.toUpperCase()}</span></div><div class="exercise-info"><h3>${e.name}</h3><p>${e.machine} · ${e.muscles.slice(0,2).join(", ")}</p><div class="card-bottom"><span>${e.sets} подхода · ${e.reps}</span><b>Подробнее ↗</b></div></div></article>`).join("") || '<p class="text-sm text-gray-400">Ничего не найдено. Попробуй изменить запрос.</p>';
- $$(".exercise-card").forEach(c=>c.addEventListener("click",()=>openExercise(c.dataset.id)));
+ $("#exerciseGrid").innerHTML=list.map(e=>`<article class="exercise-card" data-id="${e.id}"><div class="exercise-image"><img class="image-pending" loading="lazy" data-exercise-id="${e.id}" alt="Фото: ${e.name}"><span class="muscle-tag">${e.category.toUpperCase()}</span></div><div class="exercise-info"><h3>${e.name}</h3><p>${e.machine} · ${e.muscles.slice(0,2).join(", ")}</p><a class="card-video-link" href="${e.video}" target="_blank" rel="noopener" aria-label="Видео: ${e.name}" onclick="event.stopPropagation()">▶ Видео с техникой</a><div class="card-bottom"><span>${e.sets} подхода · ${e.reps}</span><b>Подробнее ↗</b></div></div></article>`).join("") || '<p class="text-sm text-gray-400">Ничего не найдено. Попробуй изменить запрос.</p>';
+ $(".exercise-card").forEach(c=>c.addEventListener("click",()=>openExercise(c.dataset.id)));
+ hydrateExerciseImages($("#exerciseGrid"));
 }
 $("#searchInput").addEventListener("input",renderCatalog);
 $$("[data-filter]").forEach(b=>b.addEventListener("click",()=>{activeFilter=b.dataset.filter;$$("[data-filter]").forEach(x=>x.classList.toggle("active",x===b));renderCatalog();}));
 function openExercise(id){
  const e=EXERCISES.find(x=>x.id===id);if(!e)return;
- $("#modalContent").innerHTML=`<img class="modal-image" src="${e.image}" alt="${e.name}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=900&q=80'"><div class="eyebrow">${e.category.toUpperCase()} · ${e.machine}</div><h2>${e.name}</h2><div class="muscle-pills">${e.muscles.map(m=>`<span>${m}</span>`).join("")}</div>${e.machineDescription?`<div class="detail-panel"><h4>О ТРЕНАЖЁРЕ / УПРАЖНЕНИИ</h4><p>${e.machineDescription}</p><p><b>Назначение:</b> ${e.purpose||""}</p><p><b>Настройка:</b> ${e.setup||""}</p></div>`:""}<h4>ТЕХНИКА ВЫПОЛНЕНИЯ</h4><ol>${e.steps.map(s=>`<li>${s}</li>`).join("")}</ol>${e.mistakes?`<div class="detail-panel"><h4>ЧАСТЫЕ ОШИБКИ</h4><ul>${e.mistakes.map(m=>`<li>${m}</li>`).join("")}</ul></div>`:""}<p><b>Ориентир:</b> ${e.sets} подхода · ${e.reps} · отдых ${e.rest} сек.</p>${e.imagePage?`<p class="image-credit">Фото: <a href="${e.imagePage}" target="_blank" rel="noopener">${e.imageCredit||"Источник изображения"}</a> · ${e.imageLicense||""}</p>`:""}<div class="modal-actions"><a class="video-link" target="_blank" rel="noopener" href="${e.video}">▶ Найти видео с демонстрацией</a><button class="btn-secondary" id="addExercise">Добавить в мой план</button></div>`;
- $("#exerciseModal").classList.remove("hidden");
+ $("#modalContent").innerHTML=`<div class="modal-video-top"><a class="video-link video-link-primary" target="_blank" rel="noopener" href="${e.video}">▶ СМОТРЕТЬ ВИДЕО ТЕХНИКИ НА YOUTUBE</a></div><img class="modal-image image-pending" data-exercise-id="${e.id}" alt="Фото: ${e.name}"><div class="eyebrow">${e.category.toUpperCase()} · ${e.machine}</div><h2>${e.name}</h2><div class="muscle-pills">${e.muscles.map(m=>`<span>${m}</span>`).join("")}</div>${e.machineDescription?`<div class="detail-panel"><h4>О ТРЕНАЖЁРЕ / УПРАЖНЕНИИ</h4><p>${e.machineDescription}</p><p><b>Назначение:</b> ${e.purpose||""}</p><p><b>Настройка:</b> ${e.setup||""}</p></div>`:""}<h4>ТЕХНИКА ВЫПОЛНЕНИЯ</h4><ol>${e.steps.map(s=>`<li>${s}</li>`).join("")}</ol>${e.mistakes?`<div class="detail-panel"><h4>ЧАСТЫЕ ОШИБКИ</h4><ul>${e.mistakes.map(m=>`<li>${m}</li>`).join("")}</ul></div>`:""}<p><b>Ориентир:</b> ${e.sets} подхода · ${e.reps} · отдых ${e.rest} сек.</p>${e.imagePage?`<p class="image-credit">Фото: <a href="${e.imagePage}" target="_blank" rel="noopener">${e.imageCredit||"Источник изображения"}</a> · ${e.imageLicense||""}</p>`:""}<div class="modal-actions"><button class="btn-secondary" id="addExercise">Добавить в мой план</button></div>`;
+ hydrateExerciseImages($("#modalContent"));\n $("#exerciseModal").classList.remove("hidden");
  $("#addExercise").addEventListener("click",()=>{if(!currentPlan)currentPlan={title:"Мой список упражнений",days:[{name:"Избранные упражнения",items:[]}]};if(!currentPlan.days[0].items.some(x=>x.id===e.id))currentPlan.days[0].items.push({...e,weight:"—"});savePlan();$("#exerciseModal").classList.add("hidden");});
 }
 $$("[data-close]").forEach(b=>b.addEventListener("click",()=>$("#exerciseModal").classList.add("hidden")));
