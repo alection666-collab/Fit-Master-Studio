@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#101714">
+  <meta name="description" content="FIT MASTER — каталог тренажёров, техника упражнений и персональный генератор тренировок.">
+  <title>FIT MASTER Studio v1.1 — тренируйся с умом</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="min-h-screen">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#"><span class="brand-mark">F</span><span>FIT<span class="brand-light">MASTER</span><small>TRAIN SMARTER</small></span></a>
+      <div class="side-label">РАБОЧЕЕ ПРОСТРАНСТВО</div>
+      <nav class="side-nav">
+        <button class="nav-item active" data-tab="catalog"><span>▦</span> Каталог</button>
+        <button class="nav-item" data-tab="builder"><span>✳</span> Подбор программы</button>
+        <button class="nav-item" data-tab="plan"><span>▤</span> Мой план <b id="planBadge">0</b></button>
+      </nav>
+      <div class="sidebar-card">
+        <div class="pulse-dot"></div>
+        <strong>Твой прогресс начинается сегодня</strong>
+        <p>Выбери цель — мы поможем составить понятный план.</p>
+        <button class="text-link" data-goto="builder">Создать программу ↗</button>
+      </div>
+      <div class="side-footer">FIT MASTER <span>v1.1</span><br><small>Тренируйся осознанно</small></div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div><div class="eyebrow">ТВОЯ ТРЕНИРОВОЧНАЯ СИСТЕМА</div><h1 id="pageTitle">Каталог тренажёров</h1></div>
+        <div class="top-actions"><span class="today-pill"><i></i> ТВОЯ ФИТНЕС-ЗОНА</span><div class="avatar">FM</div></div>
+      </header>
+
+      <section id="catalog" class="tab-panel active">
+        <div class="hero">
+          <div class="hero-copy"><span class="hero-kicker">KNOW YOUR EQUIPMENT</span><h2>Сильнее с<br><em>каждым повтором.</em></h2><p>Изучай тренажёры, разбирай технику и собирай тренировки, которые работают на твою цель.</p><button class="btn-primary" data-goto="builder">Составить программу <span>↗</span></button></div>
+          <div class="hero-visual"><img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1100&q=85" alt="Современный тренажёрный зал"><div class="hero-float"><b>01</b><span>Тренируйся<br>с пониманием</span></div></div>
+        </div>
+        <div class="section-head"><div><div class="eyebrow">БАЗА ЗНАНИЙ</div><h2>Тренажёры и упражнения</h2><p>Выбери категорию и найди нужное движение.</p></div><div class="catalog-count"><b id="catalogCount">28</b><span>УПРАЖНЕНИЙ</span></div></div>
+        <div class="filter-row"><div class="search-box"><span>⌕</span><input id="searchInput" placeholder="Поиск тренажёра или упражнения..."></div><div class="filter-chips" id="filters"><button class="chip active" data-filter="all">Все</button><button class="chip" data-filter="chest">Грудь</button><button class="chip" data-filter="back">Спина</button><button class="chip" data-filter="legs">Ноги</button><button class="chip" data-filter="shoulders">Плечи</button><button class="chip" data-filter="glutes">Ягодицы</button><button class="chip" data-filter="arms">Руки</button><button class="chip" data-filter="core">Кор</button><button class="chip" data-filter="pool">Бассейн</button></div></div>
+        <div id="exerciseGrid" class="exercise-grid"></div>
+      </section>
+
+      <section id="builder" class="tab-panel">
+        <div class="section-head builder-head"><div><div class="eyebrow">SMART PROGRAM BUILDER</div><h2>Собери свою программу</h2><p>Заполни профиль — алгоритм подберёт структуру тренировок и параметры нагрузки.</p></div><div class="step-tag">ШАГ 01 / 02</div></div>
+        <form id="profileForm" class="builder-layout">
+          <div class="form-card">
+            <div class="card-title"><span class="number">01</span><div><h3>Твои параметры</h3><p>Нужны для расчёта рекомендаций</p></div></div>
+            <div class="field-grid">
+              <label>Пол<select id="sex"><option value="male">Мужской</option><option value="female">Женский</option><option value="other">Не указывать</option></select></label>
+              <label>Возраст, лет<input id="age" type="number" min="14" max="90" value="30" required></label>
+              <label>Вес, кг<input id="weight" type="number" min="35" max="250" value="75" required></label>
+              <label>Рост, см<input id="height" type="number" min="130" max="220" value="175" required></label>
+            </div>
+            <div class="form-divider"></div>
+            <div class="card-title"><span class="number">02</span><div><h3>Твоя подготовка</h3><p>Подстроим объём и интенсивность</p></div></div>
+            <label class="full-field">Уровень подготовки<select id="level"><option value="beginner">Новичок — до 6 месяцев</option><option value="intermediate" selected>Средний — 6–24 месяца</option><option value="advanced">Опытный — более 2 лет</option></select></label>
+            <label class="full-field">Главная цель<select id="goal"><option value="fat">Похудение</option><option value="mass" selected>Набор мышечной массы</option><option value="tone">Рельеф</option><option value="maintain">Поддержание формы</option></select></label>
+            <div class="form-divider"></div>
+            <div class="card-title"><span class="number">03</span><div><h3>Доступный инвентарь</h3><p>Отметь то, что есть в твоём распоряжении</p></div></div>
+            <div class="equipment-options">
+              <label class="check-option"><input type="checkbox" name="equipment" value="gym" checked><span>🏋️ Тренажёрный зал</span></label>
+              <label class="check-option"><input type="checkbox" name="equipment" value="dumbbells" checked><span>◈ Гантели</span></label>
+              <label class="check-option"><input type="checkbox" name="equipment" value="barbell"><span>▰ Штанга</span></label>
+              <label class="check-option"><input type="checkbox" name="equipment" value="bands"><span>〰 Резинки</span></label>
+              <label class="check-option"><input type="checkbox" name="equipment" value="body"><span>◎ Собственный вес</span></label>
+              <label class="check-option"><input type="checkbox" name="equipment" value="pool"><span>〰 Бассейн</span></label>
+            </div>
+            <button class="btn-primary generate-btn" type="submit">Сгенерировать программу <span>↗</span></button>
+            <p class="disclaimer">Расчётные значения — стартовые ориентиры, а не медицинское назначение. Подбирай вес без боли и с сохранением техники.</p>
+          </div>
+          <div class="aside-info"><div class="info-icon">✳</div><h3>Умная настройка нагрузки</h3><p>Программа учитывает уровень подготовки, цель, возраст, массу тела и выбранный инвентарь.</p><div class="info-stat"><b>3</b><span>варианта недельного сплита</span></div><div class="info-stat"><b>RPE</b><span>ориентир субъективной сложности</span></div><div class="info-stat"><b>100%</b><span>план можно редактировать</span></div></div>
+        </form>
+        <div id="generatedResult" class="generated-result hidden"></div>
+      </section>
+
+      <section id="plan" class="tab-panel">
+        <div class="section-head"><div><div class="eyebrow">YOUR TRAINING SCHEDULE</div><h2>Мой план</h2><p>Сохранённая программа и параметры упражнений.</p></div><button class="btn-secondary" data-goto="builder">Изменить профиль ↗</button></div>
+        <div id="myPlanContent" class="plan-content"></div>
+      </section>
+      <footer class="app-footer">FIT MASTER <span>·</span> Тренируйся с умом. Расти последовательно.</footer>
+    </main>
+  </div>
+  <div id="exerciseModal" class="modal hidden"><div class="modal-backdrop" data-close></div><div class="modal-card"><button class="modal-close" data-close>×</button><div id="modalContent"></div></div></div>
+  <script src="js/data.js"></script><script src="js/app.js"></script>
+</body>
+</html>
