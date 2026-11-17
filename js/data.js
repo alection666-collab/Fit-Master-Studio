@@ -510,7 +510,6 @@ window.EXERCISES = [
     "imageLicense": "CC BY-SA 4.0",
     "imagePage": "https://commons.wikimedia.org/wiki/File:Seated_calf_machine.jpg"
   },
-[
   {
     "id": "rdl",
     "name": "Румынская тяга со штангой",
@@ -861,5 +860,4 @@ window.EXERCISES = [
       "Потеря устойчивого положения корпуса."
     ]
   }
-]
 ];
