@@ -67,8 +67,6 @@ function exerciseVisual(e, extraClass=""){
  };
  const p=poses[e.id]||poses.plank;
  const gear=equipment[e.id]||'<path class="prop" d="M28 180H172"/>';
- const pool=e.type==="pool";
- const water=pool?'<path class="prop water" d="M8 145Q26 137 44 145T80 145T116 145T152 145T192 145M8 165Q26 157 44 165T80 165T116 165T152 165T192 165"/>' : '';
  const EXERCISE_IMAGE_MAP={"bench":"bench-press","chestpress":"chest-press-machine","latpull":"lat-pulldown","row":"seated-cable-row","squat":"goblet-squat","legpress":"leg-press","shoulder":"dumbbell-shoulder-press","lateral":"lateral-raises","curl":"biceps-curl","plank":"plank","legextension":"leg-extension","legcurl":"leg-curl","hipabduction":"hip-abduction-machine","pecdeck":"pec-deck","smithsquat":"smith-machine-squat","assistedpullup":"assisted-pull-up","calfraise":"seated-calf-raise"};
  const imageId=EXERCISE_IMAGE_MAP[e.id];
  const imageBase=imageId?'https://raw.githubusercontent.com/MarvinNazari/exercise-images/main/images/'+imageId+'/':'';
@@ -134,8 +132,19 @@ function buildProgram(p){
  if(p.level==="beginner")groups=[["Тренировка A — всё тело",["bench","latpull","squat","shoulder","plank"]],["Тренировка B — всё тело",["chestpress","row","legpress","lateral","curl"]]];
  else if(p.level==="intermediate")groups=[["День 1 — Верх тела",["bench","latpull","shoulder","row","curl"]],["День 2 — Низ тела и кор",["squat","legpress","plank"]],["День 3 — Верх тела",["chestpress","row","lateral","curl","plank"]]];
  else groups=[["День 1 — Грудь и плечи",["bench","chestpress","shoulder","lateral"]],["День 2 — Спина и руки",["latpull","row","curl"]],["День 3 — Ноги и кор",["squat","legpress","plank"]],["День 4 — Смешанная",["chestpress","latpull","lateral","plank"]]];
- if(p.equipment.includes("pool")&&!p.equipment.includes("gym")){const poolIds=["swim","kick","backstroke","breaststroke","kickboardback","dolphinkick","waterjog","aquajacks","noodlepress","sculling","sidekick"];groups=[["Бассейн — техника и положение тела",["swim","backstroke","kickboardback","sidekick"]],["Бассейн — координация и выносливость",["breaststroke","dolphinkick","waterjog","aquajacks","noodlepress","sculling"]]];}
- const levelFactor={beginner:.45,intermediate:.60,advanced:.70}[p.level];
+ const zoneExercises={
+   chest:["bench","chestpress","pecdeck"], back:["latpull","row","assistedpullup"],
+   shoulders:["shoulder","lateral"], arms:["curl","tricepspushdown"],
+   abdomen:["plank"], glutes:["hipabduction","squat","legpress","smithsquat"],
+   thighs:["squat","legpress","legextension","legcurl","smithsquat"], calves:["calfraise"]
+  };
+  const focusIds=[...new Set((p.problemZones||[]).flatMap(z=>zoneExercises[z]||[]))];
+  if(focusIds.length){
+   const already=new Set(groups.flatMap(g=>g[1]));
+   const extras=focusIds.filter(id=>available.some(e=>e.id===id)&&!already.has(id));
+   groups=groups.map(([name,ids],index)=>[name,ids.concat(extras.filter((id,i)=>i%groups.length===index))]);
+  }
+  const levelFactor={beginner:.45,intermediate:.60,advanced:.70}[p.level];
  const goalSets={fat:3,mass:4,tone:3,maintain:2}[p.goal];
  const goalReps={fat:"12–15",mass:"6–12",tone:"10–15",maintain:"8–12"}[p.goal];
  const rest={fat:60,mass:120,tone:60,maintain:90}[p.goal];
