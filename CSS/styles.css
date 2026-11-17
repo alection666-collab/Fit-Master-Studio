@@ -118,3 +118,28 @@ body{font-size:16px}
 .exercise-visual .muscle-caption{position:absolute;z-index:2;bottom:2px;left:5px;right:5px;min-height:20px;justify-content:center;background:rgba(12,13,15,.72);border-radius:6px}
 .exercise-visual.modal-image .exercise-photo{height:calc(100% - 28px);padding:8px 20px}
 .exercise-visual.modal-image .exercise-vector-fallback{height:calc(100% - 28px)}
+
+/* v2.4 — цветовая маркировка целевых мышц */
+.exercise-visual[data-muscle-group="chest"]{--target:#ff6347}
+.exercise-visual[data-muscle-group="back"]{--target:#39c5d8}
+.exercise-visual[data-muscle-group="legs"]{--target:#ffb347}
+.exercise-visual[data-muscle-group="shoulders"]{--target:#b68cff}
+.exercise-visual[data-muscle-group="glutes"]{--target:#ff70b7}
+.exercise-visual[data-muscle-group="arms"]{--target:#f4d35e}
+.exercise-visual[data-muscle-group="core"]{--target:#7bd88f}
+.exercise-visual .muscle-caption{color:var(--target,#ff684f);border:1px solid color-mix(in srgb,var(--target,#ff684f) 48%,transparent)}
+.exercise-visual .pulse-dot{background:var(--target,#ff684f);box-shadow:0 0 9px var(--target,#ff684f)}
+.exercise-visual .primary-muscle{font-weight:900}
+.exercise-visual .secondary-muscles{color:#d6d9de;font-weight:500}
+.exercise-visual[data-muscle-group="chest"] .side-anatomy .hot{fill:#ff6347;stroke:#ffc0b2}
+.exercise-visual[data-muscle-group="back"] .side-anatomy .hot{fill:#39c5d8;stroke:#b6f4fb}
+.exercise-visual[data-muscle-group="legs"] .side-anatomy .hot{fill:#ffb347;stroke:#ffe0ad}
+.exercise-visual[data-muscle-group="shoulders"] .side-anatomy .hot{fill:#b68cff;stroke:#e1ccff}
+.exercise-visual[data-muscle-group="glutes"] .side-anatomy .hot{fill:#ff70b7;stroke:#ffd0e7}
+.exercise-visual[data-muscle-group="arms"] .side-anatomy .hot{fill:#f4d35e;stroke:#fff1ae}
+.exercise-visual[data-muscle-group="core"] .side-anatomy .hot{fill:#7bd88f;stroke:#c9f6d2}
+.zone-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0 8px}
+.zone-options .check-option{min-height:48px}
+.zone-options .check-option:has(input:checked){border-color:#c7f36b;background:rgba(199,243,107,.10)}
+.zone-note{font-size:13px;line-height:1.55;color:#aab6ae;margin:8px 0 16px}
+@media(max-width:700px){.zone-options{grid-template-columns:repeat(2,minmax(0,1fr))}}
