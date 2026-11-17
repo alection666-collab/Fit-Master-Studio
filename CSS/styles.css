@@ -50,3 +50,6 @@ body{font-size:16px}
  .modal-card{padding:18px}.modal-card h2{font-size:24px}
  .modal-card p,.modal-card li{font-size:15px}
 }
+
+/* Inline exercise SVG: works without external image hosts or data URLs */
+.exercise-visual{width:100%;height:100%;display:block;overflow:hidden;background:#25332a}.exercise-inline-svg{display:block;width:100%;height:100%;object-fit:cover}.exercise-visual.modal-image{height:260px;margin:0 0 20px;border-radius:12px;overflow:hidden}
