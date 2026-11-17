@@ -7,69 +7,28 @@ const titles = {catalog:"Каталог тренажёров",builder:"Подб�
 function showTab(tab){$$(".tab-panel").forEach(x=>x.classList.toggle("active",x.id===tab));$$(".nav-item").forEach(x=>x.classList.toggle("active",x.dataset.tab===tab));$("#pageTitle").textContent=titles[tab];if(tab==="plan")renderPlan();window.scrollTo({top:0,behavior:"smooth"});}
 $$("[data-tab]").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.tab)));
 $$("[data-goto]").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.goto)));
-const imageCache = new Map();
-let commonsQueue = Promise.resolve();
-let lastCommonsRequest = 0;
-const wait = ms => new Promise(resolve => setTimeout(resolve,ms));
-async function requestCommonsImage(e){
- const query=(e.imageQuery||e.name+" exercise").replace(/filetype:bitmap/gi,"").trim();
- const params=new URLSearchParams({
-  action:"query",generator:"search",gsrnamespace:"6",
-  gsrsearch:query+" filetype:bitmap",gsrlimit:"6",
-  prop:"imageinfo",iiprop:"url",iiurlwidth:"1000",
-  format:"json",origin:"*"
- });
- const response=await fetch("https://commons.wikimedia.org/w/api.php?"+params.toString(),{
-  method:"GET",mode:"cors",credentials:"omit",cache:"no-store"
- });
- if(!response.ok) throw new Error("Wikimedia HTTP "+response.status);
- const data=await response.json();
- if(data.error) throw new Error(data.error.info||"Wikimedia API error");
- const pages=Object.values(data.query?.pages||{});
- const page=pages.find(p=>p.imageinfo?.[0]?.thumburl||p.imageinfo?.[0]?.url);
- const info=page?.imageinfo?.[0];
- const src=info?.thumburl||info?.url||"";
- if(!src) throw new Error("No image result");
- return src;
-}
-function findExerciseImage(e){
- if(imageCache.has(e.id)) return imageCache.get(e.id);
- const task=commonsQueue.then(async()=>{
-  const gap=900-(Date.now()-lastCommonsRequest);
-  if(gap>0) await wait(gap);
-  lastCommonsRequest=Date.now();
-  try{
-   const src=await requestCommonsImage(e);
-   imageCache.set(e.id,src);
-   return src;
-  }catch(error){
-   console.warn("FIT MASTER: Wikimedia не вернула изображение для "+e.name,error);
-   imageCache.delete(e.id);
-   return "";
-  }
- });
- commonsQueue=task.then(()=>undefined,()=>undefined);
- imageCache.set(e.id,task);
- return task;
-}
+// Изображения уже прописаны в data.js. Загружаем их напрямую,
+// не делаем 29 внешних поисковых запросов к Wikimedia API.
 function hydrateExerciseImages(root=document){
- root.querySelectorAll("img[data-exercise-id]").forEach(async img=>{
-  const e=EXERCISES.find(x=>x.id===img.dataset.exerciseId);if(!e)return;
-  const src=await findExerciseImage(e);
-  if(!img.isConnected)return;
-  if(src){
-   img.onload=()=>{img.classList.remove("image-pending","image-unavailable");};
-   img.onerror=()=>{
-    img.onerror=null;
-    img.classList.remove("image-pending");
-    img.classList.add("image-unavailable");
-    img.alt="Не удалось открыть изображение. Нажми на видео с техникой.";
-   };
-   img.src=src;
-  }else{
-   img.alt="Фото временно недоступно. Обнови страницу позже.";
+ root.querySelectorAll("img[data-exercise-id]").forEach(img=>{
+  const e=EXERCISES.find(x=>x.id===img.dataset.exerciseId);
+  if(!e)return;
+  const src=e.image||"";
+  img.classList.add("image-pending");
+  img.onload=()=>{
+   img.classList.remove("image-pending","image-unavailable");
+  };
+  img.onerror=()=>{
+   img.onerror=null;
    img.classList.remove("image-pending");
    img.classList.add("image-unavailable");
+   img.alt="Изображение временно недоступно";
+  };
+  if(src) img.src=src;
+  else{
+   img.classList.remove("image-pending");
+   img.classList.add("image-unavailable");
+   img.alt="Для этого упражнения пока нет изображения";
   }
  });
 }
