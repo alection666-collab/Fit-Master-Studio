@@ -11,50 +11,33 @@ $$("[data-goto]").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.go
 // показываем локальную SVG-карточку конкретного упражнения.
 function exerciseFallbackSvg(e){
  const pool=e.type==="pool";
- const title=String(e.name||"Упражнение").replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
- const equipment=String(e.machine||"Тренировка").replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+ const esc=s=>String(s||"").replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+ const title=esc(e.name||"Упражнение");
+ const equipment=esc(e.machine||"Тренировка");
  const bg=pool?"#153c49":"#26352b";
  const accent=pool?"#62d5e8":"#c7f36b";
  const scene=pool
- ? '<path d="M35 245 Q75 225 115 245 T195 245 T275 245 T355 245" fill="none" stroke="#62d5e8" stroke-width="5"/><path d="M35 265 Q75 245 115 265 T195 265 T275 265 T355 265" fill="none" stroke="#62d5e8" stroke-width="4" opacity=".65"/><circle cx="188" cy="112" r="19" fill="#f0c6a3"/><path d="M170 139 Q205 126 235 150 L268 170 M181 145 L135 172 M230 150 L276 130 M205 151 L224 205 L185 224 M224 205 L269 218" fill="none" stroke="#f0c6a3" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>'
- : '<circle cx="188" cy="91" r="18" fill="#f0c6a3"/><path d="M188 113 L188 180 M188 132 L132 157 M188 132 L244 157 M188 180 L151 231 M188 180 L226 231" fill="none" stroke="#f0c6a3" stroke-width="14" stroke-linecap="round"/><path d="M92 238 H284" stroke="#8c9b8f" stroke-width="8" stroke-linecap="round"/><path d="M104 238 V258 M272 238 V258" stroke="#8c9b8f" stroke-width="7"/>';
- const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 300"><rect width="380" height="300" rx="18" fill="'+bg+'"/><circle cx="188" cy="145" r="105" fill="'+accent+'" opacity=".08"/>'+scene+'<rect x="18" y="18" width="344" height="264" rx="14" fill="none" stroke="'+accent+'" opacity=".35"/><text x="190" y="30" text-anchor="middle" fill="'+accent+'" font-family="Arial,sans-serif" font-size="10" letter-spacing="2">FIT MASTER · УПРАЖНЕНИЕ</text><rect x="18" y="226" width="344" height="56" rx="10" fill="#101914" opacity=".88"/><text x="190" y="249" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif" font-size="13" font-weight="700">'+title+'</text><text x="190" y="267" text-anchor="middle" fill="#b8c7bb" font-family="Arial,sans-serif" font-size="10">'+equipment+'</text></svg>';
- return "data:image/svg+xml;charset=UTF-8,"+encodeURIComponent(svg);
+ ? '<path d="M35 245 Q75 225 115 245 T195 245 T275 245 T355 245" fill="none" stroke="#62d5e8" stroke-width="5"/><path d="M35 265 Q75 245 115 265 T195 265 T275 265 T355 265" fill="none" stroke="#62d5e8" stroke-width="4"/><circle cx="188" cy="112" r="19" fill="#f0c6a3"/><path d="M170 139 Q205 126 235 150 L268 170 M181 145 L135 172 M230 150 L276 130 M205 151 L224 205 L185 224 M224 205 L269 218" fill="none" stroke="#f0c6a3" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>'
+ : '<circle cx="188" cy="91" r="18" fill="#f0c6a3"/><path d="M188 113 L188 180 M188 132 L132 157 M188 132 L244 157 M188 180 L151 231 M188 180 L226 231" fill="none" stroke="#f0c6a3" stroke-width="14" stroke-linecap="round"/><path d="M92 238 H284 M104 238 V258 M272 238 V258" stroke="#8c9b8f" stroke-width="8" stroke-linecap="round"/>';
+ return '<svg class="exercise-inline-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 300" role="img" aria-label="'+title+'"><rect width="380" height="300" rx="18" fill="'+bg+'"/><circle cx="188" cy="145" r="105" fill="'+accent+'" opacity=".08"/>'+scene+'<rect x="18" y="18" width="344" height="264" rx="14" fill="none" stroke="'+accent+'" opacity=".35"/><text x="190" y="30" text-anchor="middle" fill="'+accent+'" font-family="Arial,sans-serif" font-size="10" letter-spacing="2">FIT MASTER · УПРАЖНЕНИЕ</text><rect x="18" y="226" width="344" height="56" rx="10" fill="#101914" opacity=".88"/><text x="190" y="249" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif" font-size="13" font-weight="700">'+title+'</text><text x="190" y="267" text-anchor="middle" fill="#b8c7bb" font-family="Arial,sans-serif" font-size="10">'+equipment+'</text></svg>';
 }
-function hydrateExerciseImages(root=document){
- root.querySelectorAll("img[data-exercise-id]").forEach(img=>{
-  const e=EXERCISES.find(x=>x.id===img.dataset.exerciseId);if(!e)return;
-  const fallback=exerciseFallbackSvg(e);
-  let fallbackUsed=false;
-  img.onload=()=>img.classList.remove("image-pending","image-unavailable");
-  img.onerror=()=>{
-   if(!fallbackUsed){
-    fallbackUsed=true;
-    img.src=fallback;
-   }else{
-    img.classList.remove("image-pending");
-    img.classList.add("image-unavailable");
-    img.alt="Иллюстрация упражнения";
-   }
-  };
-  img.classList.add("image-pending");
-  img.src=e.image||fallback;
- });
+function exerciseVisual(e, extraClass=""){
+ return '<div class="exercise-visual '+extraClass+'">'+exerciseFallbackSvg(e)+'</div>';
 }
 function renderCatalog(){
  const q=$("#searchInput").value.toLowerCase();
  const list=EXERCISES.filter(e=>(activeFilter==="all"||e.type===activeFilter)&&(`${e.name} ${e.machine} ${e.category} ${e.muscles.join(" ")}`).toLowerCase().includes(q));
  $("#catalogCount").textContent=list.length;
- $("#exerciseGrid").innerHTML=list.map(e=>`<article class="exercise-card" data-id="${e.id}"><div class="exercise-image"><img class="image-pending" loading="lazy" data-exercise-id="${e.id}" alt="Фото: ${e.name}"><span class="muscle-tag">${e.category.toUpperCase()}</span></div><div class="exercise-info"><h3>${e.name}</h3><p>${e.machine} · ${e.muscles.slice(0,2).join(", ")}</p><a class="card-video-link" href="${e.video}" target="_blank" rel="noopener" aria-label="Видео: ${e.name}" onclick="event.stopPropagation()">▶ Видео с техникой</a><div class="card-bottom"><span>${e.sets} подхода · ${e.reps}</span><b>Подробнее ↗</b></div></div></article>`).join("") || '<p class="text-sm text-gray-400">Ничего не найдено. Попробуй изменить запрос.</p>';
+ $("#exerciseGrid").innerHTML=list.map(e=>`<article class="exercise-card" data-id="${e.id}"><div class="exercise-image">${exerciseVisual(e)}<span class="muscle-tag">${e.category.toUpperCase()}</span></div><div class="exercise-info"><h3>${e.name}</h3><p>${e.machine} · ${e.muscles.slice(0,2).join(", ")}</p><a class="card-video-link" href="${e.video}" target="_blank" rel="noopener" aria-label="Видео: ${e.name}" onclick="event.stopPropagation()">▶ Видео с техникой</a><div class="card-bottom"><span>${e.sets} подхода · ${e.reps}</span><b>Подробнее ↗</b></div></div></article>`).join("") || '<p class="text-sm text-gray-400">Ничего не найдено. Попробуй изменить запрос.</p>';
  $(".exercise-card").forEach(c=>c.addEventListener("click",()=>openExercise(c.dataset.id)));
- hydrateExerciseImages($("#exerciseGrid"));
+ 
 }
 $("#searchInput").addEventListener("input",renderCatalog);
 $$("[data-filter]").forEach(b=>b.addEventListener("click",()=>{activeFilter=b.dataset.filter;$$("[data-filter]").forEach(x=>x.classList.toggle("active",x===b));renderCatalog();}));
 function openExercise(id){
  const e=EXERCISES.find(x=>x.id===id);if(!e)return;
- $("#modalContent").innerHTML=`<div class="modal-video-top"><a class="video-link video-link-primary" target="_blank" rel="noopener" href="${e.video}">▶ СМОТРЕТЬ ВИДЕО ТЕХНИКИ НА YOUTUBE</a></div><img class="modal-image image-pending" data-exercise-id="${e.id}" alt="Фото: ${e.name}"><div class="eyebrow">${e.category.toUpperCase()} · ${e.machine}</div><h2>${e.name}</h2><div class="muscle-pills">${e.muscles.map(m=>`<span>${m}</span>`).join("")}</div>${e.machineDescription?`<div class="detail-panel"><h4>О ТРЕНАЖЁРЕ / УПРАЖНЕНИИ</h4><p>${e.machineDescription}</p><p><b>Назначение:</b> ${e.purpose||""}</p><p><b>Настройка:</b> ${e.setup||""}</p></div>`:""}<h4>ТЕХНИКА ВЫПОЛНЕНИЯ</h4><ol>${e.steps.map(s=>`<li>${s}</li>`).join("")}</ol>${e.mistakes?`<div class="detail-panel"><h4>ЧАСТЫЕ ОШИБКИ</h4><ul>${e.mistakes.map(m=>`<li>${m}</li>`).join("")}</ul></div>`:""}<p><b>Ориентир:</b> ${e.sets} подхода · ${e.reps} · отдых ${e.rest} сек.</p>${e.imagePage?`<p class="image-credit">Фото: <a href="${e.imagePage}" target="_blank" rel="noopener">${e.imageCredit||"Источник изображения"}</a> · ${e.imageLicense||""}</p>`:""}<div class="modal-actions"><button class="btn-secondary" id="addExercise">Добавить в мой план</button></div>`;
- hydrateExerciseImages($("#modalContent"));
+ $("#modalContent").innerHTML=`<div class="modal-video-top"><a class="video-link video-link-primary" target="_blank" rel="noopener" href="${e.video}">▶ СМОТРЕТЬ ВИДЕО ТЕХНИКИ НА YOUTUBE</a></div>${exerciseVisual(e,"modal-image")}<div class="eyebrow">${e.category.toUpperCase()} · ${e.machine}</div><h2>${e.name}</h2><div class="muscle-pills">${e.muscles.map(m=>`<span>${m}</span>`).join("")}</div>${e.machineDescription?`<div class="detail-panel"><h4>О ТРЕНАЖЁРЕ / УПРАЖНЕНИИ</h4><p>${e.machineDescription}</p><p><b>Назначение:</b> ${e.purpose||""}</p><p><b>Настройка:</b> ${e.setup||""}</p></div>`:""}<h4>ТЕХНИКА ВЫПОЛНЕНИЯ</h4><ol>${e.steps.map(s=>`<li>${s}</li>`).join("")}</ol>${e.mistakes?`<div class="detail-panel"><h4>ЧАСТЫЕ ОШИБКИ</h4><ul>${e.mistakes.map(m=>`<li>${m}</li>`).join("")}</ul></div>`:""}<p><b>Ориентир:</b> ${e.sets} подхода · ${e.reps} · отдых ${e.rest} сек.</p>${e.imagePage?`<p class="image-credit">Фото: <a href="${e.imagePage}" target="_blank" rel="noopener">${e.imageCredit||"Источник изображения"}</a> · ${e.imageLicense||""}</p>`:""}<div class="modal-actions"><button class="btn-secondary" id="addExercise">Добавить в мой план</button></div>`;
+
  $("#exerciseModal").classList.remove("hidden");
  $("#addExercise").addEventListener("click",()=>{if(!currentPlan)currentPlan={title:"Мой список упражнений",days:[{name:"Избранные упражнения",items:[]}]};if(!currentPlan.days[0].items.some(x=>x.id===e.id))currentPlan.days[0].items.push({...e,weight:"—"});savePlan();$("#exerciseModal").classList.add("hidden");});
 }
