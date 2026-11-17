@@ -7,22 +7,31 @@ const titles = {catalog:"Каталог тренажёров",builder:"Подб�
 function showTab(tab){$$(".tab-panel").forEach(x=>x.classList.toggle("active",x.id===tab));$$(".nav-item").forEach(x=>x.classList.toggle("active",x.dataset.tab===tab));$("#pageTitle").textContent=titles[tab];if(tab==="plan")renderPlan();window.scrollTo({top:0,behavior:"smooth"});}
 $$("[data-tab]").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.tab)));
 $$("[data-goto]").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.goto)));
-// Надёжная схема: сначала пробуем фото из базы, а при ошибке
-// показываем локальную SVG-карточку конкретного упражнения.
-function exerciseFallbackSvg(e){
- const pool=e.type==="pool";
- const esc=s=>String(s||"").replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
- const title=esc(e.name||"Упражнение");
- const equipment=esc(e.machine||"Тренировка");
- const bg=pool?"#153c49":"#26352b";
- const accent=pool?"#62d5e8":"#c7f36b";
- const scene=pool
- ? '<path d="M35 245 Q75 225 115 245 T195 245 T275 245 T355 245" fill="none" stroke="#62d5e8" stroke-width="5"/><path d="M35 265 Q75 245 115 265 T195 265 T275 265 T355 265" fill="none" stroke="#62d5e8" stroke-width="4"/><circle cx="188" cy="112" r="19" fill="#f0c6a3"/><path d="M170 139 Q205 126 235 150 L268 170 M181 145 L135 172 M230 150 L276 130 M205 151 L224 205 L185 224 M224 205 L269 218" fill="none" stroke="#f0c6a3" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>'
- : '<circle cx="188" cy="91" r="18" fill="#f0c6a3"/><path d="M188 113 L188 180 M188 132 L132 157 M188 132 L244 157 M188 180 L151 231 M188 180 L226 231" fill="none" stroke="#f0c6a3" stroke-width="14" stroke-linecap="round"/><path d="M92 238 H284 M104 238 V258 M272 238 V258" stroke="#8c9b8f" stroke-width="8" stroke-linecap="round"/>';
- return '<svg class="exercise-inline-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 300" role="img" aria-label="'+title+'"><rect width="380" height="300" rx="18" fill="'+bg+'"/><circle cx="188" cy="145" r="105" fill="'+accent+'" opacity=".08"/>'+scene+'<rect x="18" y="18" width="344" height="264" rx="14" fill="none" stroke="'+accent+'" opacity=".35"/><text x="190" y="30" text-anchor="middle" fill="'+accent+'" font-family="Arial,sans-serif" font-size="10" letter-spacing="2">FIT MASTER · УПРАЖНЕНИЕ</text><rect x="18" y="226" width="344" height="56" rx="10" fill="#101914" opacity=".88"/><text x="190" y="249" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif" font-size="13" font-weight="700">'+title+'</text><text x="190" y="267" text-anchor="middle" fill="#b8c7bb" font-family="Arial,sans-serif" font-size="10">'+equipment+'</text></svg>';
-}
+// Анимированная схема упражнения: движение + подсветка работающих мышц.
 function exerciseVisual(e, extraClass=""){
- return '<div class="exercise-visual '+extraClass+'">'+exerciseFallbackSvg(e)+'</div>';
+ const group = e.type==="pool" ? "pool" :
+   ["chest"].includes(e.type) ? "chest" :
+   ["back"].includes(e.type) ? "back" :
+   ["legs","glutes"].includes(e.type) ? "legs" :
+   ["shoulders"].includes(e.type) ? "shoulders" :
+   ["arms"].includes(e.type) ? "arms" : "core";
+ const muscleNames = (e.muscles||[]).slice(0,3).join(" · ");
+ const safe = s=>String(s||"").replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+ const muscles = {
+  chest:'<ellipse class="hot chestL" cx="86" cy="82" rx="17" ry="12"/><ellipse class="hot chestR" cx="114" cy="82" rx="17" ry="12"/><path class="hot triceps" d="M68 88 Q54 103 55 126 L65 132 Q72 109 78 98 M132 88 Q146 103 145 126 L135 132 Q128 109 122 98"/>',
+  back:'<path class="hot backL" d="M83 67 Q65 75 69 108 L86 119 L96 92Z"/><path class="hot backR" d="M117 67 Q135 75 131 108 L114 119 L104 92Z"/><ellipse class="hot biceps" cx="61" cy="108" rx="8" ry="16"/><ellipse class="hot biceps" cx="139" cy="108" rx="8" ry="16"/>',
+  legs:'<path class="hot quads" d="M83 132 L99 136 L94 184 L79 183Z M101 136 L117 132 L121 183 L106 184Z"/><path class="hot glutes" d="M82 111 Q100 104 118 111 L116 133 L84 133Z"/><path class="hot hamstrings" d="M80 184 L94 184 L91 225 L78 225Z M106 184 L121 184 L123 225 L110 225Z"/>',
+  shoulders:'<ellipse class="hot delts" cx="70" cy="70" rx="13" ry="12"/><ellipse class="hot delts" cx="130" cy="70" rx="13" ry="12"/><path class="hot triceps" d="M64 82 L55 126 L66 130 L77 91Z M136 82 L145 126 L134 130 L123 91Z"/>',
+  arms:'<ellipse class="hot biceps" cx="62" cy="103" rx="9" ry="18"/><ellipse class="hot biceps" cx="138" cy="103" rx="9" ry="18"/><path class="hot triceps" d="M68 83 L57 119 L68 126 L78 91Z M132 83 L143 119 L132 126 L122 91Z"/>',
+  core:'<path class="hot abs" d="M88 91 L112 91 L116 130 L84 130Z"/><path class="hot obliques" d="M78 91 L87 95 L84 128 L74 121Z M122 91 L113 95 L116 128 L126 121Z"/>',
+  pool:'<path class="hot abs" d="M88 91 L112 91 L116 130 L84 130Z"/><path class="hot delts" d="M70 69 L82 72 L76 88Z M130 69 L118 72 L124 88Z"/><path class="hot quads" d="M83 132 L99 136 L94 184 L79 183Z M101 136 L117 132 L121 183 L106 184Z"/>'
+ };
+ const equipment = group==="chest" ? '<path class="prop" d="M32 150 H168 M43 150 V166 M157 150 V166 M47 45 H153 M55 40 V50 M145 40 V50"/>' :
+  group==="back" ? '<path class="prop" d="M30 30 V145 M25 30 H35 M25 145 H35 M30 30 L65 48 M135 48 L170 30"/>' :
+  group==="legs" ? '<path class="prop" d="M35 178 H165 M42 178 L35 195 M158 178 L165 195"/>' :
+  group==="pool" ? '<path class="prop water" d="M15 202 Q35 192 55 202 T95 202 T135 202 T175 202 M15 216 Q35 206 55 216 T95 216 T135 216 T175 216"/>' :
+  '<path class="prop" d="M38 150 H162 M45 150 V166 M155 150 V166"/>';
+ return '<div class="exercise-visual '+extraClass+'"><div class="motion-stage motion-'+group+'"><svg class="anatomy" viewBox="0 0 200 230" role="img" aria-label="Анимация упражнения '+safe(e.name)+'. Подсвечены работающие мышцы: '+safe(muscleNames)+'"><defs><linearGradient id="skin-'+safe(e.id)+'" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d9e0d8"/><stop offset="1" stop-color="#87968c"/></linearGradient></defs>'+equipment+'<g class="body"><circle cx="100" cy="38" r="16" fill="url(#skin-'+safe(e.id)+')"/><path class="torso" d="M82 58 Q100 50 118 58 L123 111 Q100 124 77 111Z"/><path class="limbs" d="M82 65 L65 88 L54 124 M118 65 L135 88 L146 124 M87 111 L83 158 L78 218 M113 111 L117 158 L122 218" fill="none" stroke="url(#skin-'+safe(e.id)+')" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>'+muscles[group]+'</g><circle cx="100" cy="38" r="16" fill="none" stroke="#eef3ed" stroke-opacity=".5"/></svg></div><div class="muscle-caption"><span class="pulse-dot"></span><span>'+safe(muscleNames)+'</span></div></div>';
 }
 function renderCatalog(){
  const q=$("#searchInput").value.toLowerCase();
