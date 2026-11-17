@@ -125,7 +125,9 @@ $$("[data-close]").forEach(b=>b.addEventListener("click",()=>$("#exerciseModal")
 $("#exerciseModal").addEventListener("click",e=>{if(e.target.classList.contains("modal-backdrop"))$("#exerciseModal").classList.add("hidden")});
 function getSelectedEquipment(){return $$('input[name="equipment"]:checked').map(x=>x.value)}
 function buildProgram(p){
+ const herniaExcluded=["rdl","squat","smithsquat","hacksquat","legpress","backextension","cablecrunch"];
  const available=EXERCISES.filter(e=>{
+  if(p.excludeHerniaRisk&&herniaExcluded.includes(e.id))return false;
   if(e.machine==="Гантели"||e.machine.includes("гантел"))return p.equipment.includes("dumbbells")||p.equipment.includes("gym");
   if(e.machine==="Собственный вес")return p.equipment.includes("body")||p.equipment.includes("gym");
   return p.equipment.includes("gym")||p.equipment.includes("barbell");
@@ -154,11 +156,11 @@ function buildProgram(p){
   const kg=Math.max(1,Math.round(p.weight*factor*levelFactor/2.5)*2.5);
   return {...e,sets:p.level==="beginner"?2:goalSets,reps:goalReps,rest,weight:e.machine==="Собственный вес"?"Собственный вес":kg+" кг*"};
  })}));
- return {title:"Программа: "+({fat:"Похудение",mass:"Набор массы",tone:"Рельеф",maintain:"Поддержание формы"})[p.goal],profile:p,days,created:new Date().toLocaleDateString("ru-RU"),note:"* Оценка стартового веса условная. Начни с лёгкой нагрузки, оставляй 2–3 повтора в запасе и корректируй вес по технике и самочувствию. Между силовыми днями одной группы оставляй время на восстановление."};
+ return {title:"Программа: "+({fat:"Похудение",mass:"Набор массы",tone:"Рельеф",maintain:"Поддержание формы"})[p.goal],profile:p,days,created:new Date().toLocaleDateString("ru-RU"),note:"* Оценка стартового веса условная. Начни с лёгкой нагрузки, оставляй 2–3 повтора в запасе и корректируй вес по технике и самочувствию. Между силовыми днями одной группы оставляй время на восстановление."+(p.excludeHerniaRisk?" При включённом фильтре исключены некоторые упражнения с заметной осевой нагрузкой или сгибанием позвоночника. Это не делает оставшиеся упражнения автоматически безопасными при грыже.":"")};
 }
 $("#profileForm").addEventListener("submit",e=>{
  e.preventDefault();
- const p={sex:$("#sex").value,age:+$("#age").value,weight:+$("#weight").value,height:+$("#height").value,level:$("#level").value,goal:$("#goal").value,equipment:getSelectedEquipment(),problemZones:$$("input[name=\"problemZone\"]:checked").map(x=>x.value),daysPerWeek:+$("#daysPerWeek").value};
+ const p={sex:$("#sex").value,age:+$("#age").value,weight:+$("#weight").value,height:+$("#height").value,level:$("#level").value,goal:$("#goal").value,equipment:getSelectedEquipment(),problemZones:$$("input[name=\"problemZone\"]:checked").map(x=>x.value),daysPerWeek:+$("#daysPerWeek").value,excludeHerniaRisk:$("#excludeHerniaRisk").checked};
  if(!p.equipment.length){alert("Выбери хотя бы один вариант инвентаря.");return;}
  if(p.age<14||p.age>90||p.weight<35||p.weight>250||p.height<130||p.height>220){alert("Проверь введённые параметры.");return;}
  lastGenerated=buildProgram(p);renderGenerated(lastGenerated);
