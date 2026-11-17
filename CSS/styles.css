@@ -63,7 +63,7 @@ body{font-size:16px}
 .anatomy .limbs{stroke:#aab6ac}
 .anatomy .hot{fill:#ff684f;stroke:#ffb19f;stroke-width:1;opacity:.95;filter:drop-shadow(0 0 5px #ff563e);}
 .anatomy .prop{fill:none;stroke:#a8b9ad;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;opacity:.72}
-.anatomy .water{stroke:#4bc7dc;stroke-width:3}
+
 .muscle-caption{display:flex;align-items:center;gap:7px;max-width:100%;color:#ffb5a7;font-size:10px;font-weight:700;text-align:center;line-height:1.25;padding:4px 2px}
 .muscle-caption .pulse-dot{flex:0 0 7px;width:7px;height:7px;border-radius:50%;background:#ff684f;box-shadow:0 0 9px #ff684f;}
 .motion-chest .body{transform-origin:100px 110px;}
@@ -72,7 +72,7 @@ body{font-size:16px}
 .motion-shoulders .body{transform-origin:100px 85px;}
 .motion-arms .body{transform-origin:100px 85px;}
 .motion-core .body{transform-origin:100px 110px;}
-.motion-pool .body{transform-origin:100px 110px;}
+
 @media(max-width:700px){.motion-stage{height:100px}.muscle-caption{font-size:9px}}
 .modal-image .motion-stage{height:210px}
 
@@ -94,7 +94,7 @@ body{font-size:16px}
 .motion-shoulders .side-anatomy .body{transform-origin:100px 90px;}
 .motion-arms .side-anatomy .body{transform-origin:100px 90px;}
 .motion-core .side-anatomy .body{transform-origin:100px 110px;}
-.motion-pool .side-anatomy .body{transform-origin:100px 110px;}
+
 
 /* v2.0 — unified dark technical exercise plate style */
 .exercise-visual{background:radial-gradient(ellipse at 50% 42%,#25282c 0%,#101114 78%)!important;border:1px solid #41444a;border-radius:12px;padding:7px 9px!important}
@@ -103,7 +103,7 @@ body{font-size:16px}
 .side-anatomy .limb{stroke:#aeb4ba}
 .side-anatomy .arm-far{stroke:#858b92}
 .side-anatomy .prop{stroke:#aeb3ba;stroke-width:3.2;opacity:.9;filter:drop-shadow(0 1px 1px #000)}
-.side-anatomy .prop.water{stroke:#64c6df}
+
 .side-anatomy .hot{fill:#ff5039;stroke:#ffb09a;filter:drop-shadow(0 0 6px #ff5039)}
 .muscle-caption{color:#ffb5a6;font-size:11px}
 .exercise-visual.modal-image{background:#101114!important;border:1px solid #41444a}
@@ -143,3 +143,15 @@ body{font-size:16px}
 .zone-options .check-option:has(input:checked){border-color:#c7f36b;background:rgba(199,243,107,.10)}
 .zone-note{font-size:13px;line-height:1.55;color:#aab6ae;margin:8px 0 16px}
 @media(max-width:700px){.zone-options{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* v2.4 — мини-карта активных мышц поверх фото упражнения */
+.exercise-visual.media-loaded .exercise-vector-fallback{
+  inset:8px 8px auto auto;width:92px;height:112px;
+  opacity:1;visibility:visible;z-index:2;
+  border:1px solid var(--target,#ff684f);border-radius:9px;
+  background:rgba(13,15,18,.88);box-shadow:0 4px 14px rgba(0,0,0,.42);
+  padding:3px;
+}
+.exercise-visual.media-loaded .exercise-vector-fallback .machine-props{display:none}
+.exercise-visual.media-loaded .exercise-vector-fallback .exercise-inline-svg{width:100%;height:100%;object-fit:contain}
+.exercise-visual.modal-image.media-loaded .exercise-vector-fallback{width:124px;height:150px;inset:12px 12px auto auto}
