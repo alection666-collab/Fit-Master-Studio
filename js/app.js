@@ -7,29 +7,38 @@ const titles = {catalog:"Каталог тренажёров",builder:"Подб�
 function showTab(tab){$$(".tab-panel").forEach(x=>x.classList.toggle("active",x.id===tab));$$(".nav-item").forEach(x=>x.classList.toggle("active",x.dataset.tab===tab));$("#pageTitle").textContent=titles[tab];if(tab==="plan")renderPlan();window.scrollTo({top:0,behavior:"smooth"});}
 $$("[data-tab]").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.tab)));
 $$("[data-goto]").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.goto)));
-// Изображения уже прописаны в data.js. Загружаем их напрямую,
-// не делаем 29 внешних поисковых запросов к Wikimedia API.
+// Надёжная схема: сначала пробуем фото из базы, а при ошибке
+// показываем локальную SVG-карточку конкретного упражнения.
+function exerciseFallbackSvg(e){
+ const pool=e.type==="pool";
+ const title=String(e.name||"Упражнение").replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+ const equipment=String(e.machine||"Тренировка").replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+ const bg=pool?"#153c49":"#26352b";
+ const accent=pool?"#62d5e8":"#c7f36b";
+ const scene=pool
+ ? '<path d="M35 245 Q75 225 115 245 T195 245 T275 245 T355 245" fill="none" stroke="#62d5e8" stroke-width="5"/><path d="M35 265 Q75 245 115 265 T195 265 T275 265 T355 265" fill="none" stroke="#62d5e8" stroke-width="4" opacity=".65"/><circle cx="188" cy="112" r="19" fill="#f0c6a3"/><path d="M170 139 Q205 126 235 150 L268 170 M181 145 L135 172 M230 150 L276 130 M205 151 L224 205 L185 224 M224 205 L269 218" fill="none" stroke="#f0c6a3" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>'
+ : '<circle cx="188" cy="91" r="18" fill="#f0c6a3"/><path d="M188 113 L188 180 M188 132 L132 157 M188 132 L244 157 M188 180 L151 231 M188 180 L226 231" fill="none" stroke="#f0c6a3" stroke-width="14" stroke-linecap="round"/><path d="M92 238 H284" stroke="#8c9b8f" stroke-width="8" stroke-linecap="round"/><path d="M104 238 V258 M272 238 V258" stroke="#8c9b8f" stroke-width="7"/>';
+ const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 300"><rect width="380" height="300" rx="18" fill="'+bg+'"/><circle cx="188" cy="145" r="105" fill="'+accent+'" opacity=".08"/>'+scene+'<rect x="18" y="18" width="344" height="264" rx="14" fill="none" stroke="'+accent+'" opacity=".35"/><text x="190" y=" thirty" text-anchor="middle" fill="'+accent+'" font-family="Arial,sans-serif" font-size="10" letter-spacing="2">FIT MASTER · УПРАЖНЕНИЕ</text><rect x="18" y="226" width="344" height="56" rx="10" fill="#101914" opacity=".88"/><text x="190" y="249" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif" font-size="13" font-weight="700">'+title+'</text><text x="190" y="267" text-anchor="middle" fill="#b8c7bb" font-family="Arial,sans-serif" font-size="10">'+equipment+'</text></svg>';
+ return "data:image/svg+xml;charset=UTF-8,"+encodeURIComponent(svg);
+}
 function hydrateExerciseImages(root=document){
  root.querySelectorAll("img[data-exercise-id]").forEach(img=>{
-  const e=EXERCISES.find(x=>x.id===img.dataset.exerciseId);
-  if(!e)return;
-  const src=e.image||"";
-  img.classList.add("image-pending");
-  img.onload=()=>{
-   img.classList.remove("image-pending","image-unavailable");
-  };
+  const e=EXERCISES.find(x=>x.id===img.dataset.exerciseId);if(!e)return;
+  const fallback=exerciseFallbackSvg(e);
+  let fallbackUsed=false;
+  img.onload=()=>img.classList.remove("image-pending","image-unavailable");
   img.onerror=()=>{
-   img.onerror=null;
-   img.classList.remove("image-pending");
-   img.classList.add("image-unavailable");
-   img.alt="Изображение временно недоступно";
+   if(!fallbackUsed){
+    fallbackUsed=true;
+    img.src=fallback;
+   }else{
+    img.classList.remove("image-pending");
+    img.classList.add("image-unavailable");
+    img.alt="Иллюстрация упражнения";
+   }
   };
-  if(src) img.src=src;
-  else{
-   img.classList.remove("image-pending");
-   img.classList.add("image-unavailable");
-   img.alt="Для этого упражнения пока нет изображения";
-  }
+  img.classList.add("image-pending");
+  img.src=e.image||fallback;
  });
 }
 function renderCatalog(){
