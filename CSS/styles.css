@@ -112,3 +112,16 @@ body{font-size:16px}
 @keyframes sideCore{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
 @keyframes sideSwim{0%,100%{transform:translateY(2px) rotate(-3deg)}50%{transform:translateY(-3px) rotate(3deg)}}
 @media(prefers-reduced-motion:reduce){.side-anatomy .hot,.side-anatomy .body{animation:none!important}}
+
+/* v2.0 — unified dark technical exercise plate style */
+.exercise-visual{background:radial-gradient(ellipse at 50% 42%,#25282c 0%,#101114 78%)!important;border:1px solid #41444a;border-radius:12px;padding:7px 9px!important}
+.side-anatomy .head{fill:#c9cdd1;stroke:#f5f5f5}
+.side-anatomy .torso{fill:#aeb4ba;stroke:#e5e8eb}
+.side-anatomy .limb{stroke:#aeb4ba}
+.side-anatomy .arm-far{stroke:#858b92}
+.side-anatomy .prop{stroke:#aeb3ba;stroke-width:3.2;opacity:.9;filter:drop-shadow(0 1px 1px #000)}
+.side-anatomy .prop.water{stroke:#64c6df}
+.side-anatomy .hot{fill:#ff5039;stroke:#ffb09a;filter:drop-shadow(0 0 6px #ff5039)}
+.muscle-caption{color:#ffb5a6;font-size:11px}
+.exercise-visual.modal-image{background:#101114!important;border:1px solid #41444a}
+@media(max-width:700px){.muscle-caption{font-size:10px}}
