@@ -258,3 +258,6 @@ body{font-size:16px}
 
 /* FIT MASTER v2.8 — выбор количества тренировочных дней */
 #daysPerWeek{width:100%;min-height:48px;padding:12px 14px;background:#17221b;color:#f3f7f3;border:1px solid #405448;border-radius:10px;font-size:16px;font-weight:700;outline:none}#daysPerWeek:focus{border-color:var(--lime);box-shadow:0 0 0 3px rgba(199,243,107,.12)}
+
+/* FIT MASTER v2.9 — health filter notice */
+.health-filter{display:flex;align-items:flex-start;gap:12px;padding:14px 15px;background:#24251d;border:1px solid #766d39;border-radius:11px;color:#f4f0d2;line-height:1.45}.health-filter input{width:20px;height:20px;flex:0 0 20px;margin-top:1px;accent-color:var(--lime)}.health-filter span{font-size:13px;font-weight:800}.health-note{margin:9px 2px 0;color:#c9c3a3;font-size:11px;line-height:1.6}
