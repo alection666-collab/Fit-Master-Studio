@@ -180,3 +180,43 @@ body{font-size:16px}
  .exercise-visual .muscle-caption{font-size:11px!important;min-height:29px!important;padding:6px 7px!important}
  .exercise-visual .muscle-caption .secondary-muscles{font-size:9px!important}
 }
+
+
+/* FIT MASTER v2.6 — подпись мышечной группы поверх всей фотографии */
+.exercise-visual .exercise-photo{
+  width:100%!important;height:100%!important;inset:0!important;
+  object-fit:contain!important;padding:0!important;z-index:1!important;
+  background:#101114!important;
+}
+.exercise-visual .exercise-vector-fallback{
+  inset:0!important;width:100%!important;height:100%!important;
+}
+.exercise-visual.media-loaded .exercise-vector-fallback{
+  /* Небольшая анатомическая схема остаётся в углу поверх фото */
+  inset:8px 8px auto auto!important;width:68px!important;height:82px!important;
+}
+.exercise-visual .muscle-caption{
+  position:absolute!important;z-index:4!important;
+  left:8px!important;right:8px!important;bottom:8px!important;
+  min-height:34px!important;padding:7px 10px!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  flex-wrap:wrap!important;gap:5px 8px!important;
+  background:rgba(5,8,7,.91)!important;
+  border:1px solid var(--target,#c7f36b)!important;
+  border-radius:8px!important;backdrop-filter:blur(5px);
+  box-shadow:0 2px 12px rgba(0,0,0,.65)!important;
+  text-shadow:0 1px 3px #000!important;
+}
+.exercise-visual .muscle-caption .primary-muscle{
+  color:#fff!important;font-size:12px!important;font-weight:900!important;
+}
+.exercise-visual .muscle-caption .secondary-muscles{
+  color:#f2f4f2!important;font-size:10px!important;font-weight:700!important;
+}
+.exercise-visual.modal-image .exercise-photo{height:100%!important;padding:0!important}
+.exercise-visual.modal-image .exercise-vector-fallback{height:100%!important}
+.exercise-visual.modal-image .muscle-caption{bottom:10px!important;left:12px!important;right:12px!important}
+@media(max-width:700px){
+ .exercise-visual .muscle-caption .primary-muscle{font-size:11px!important}
+ .exercise-visual .muscle-caption .secondary-muscles{font-size:9px!important}
+}
