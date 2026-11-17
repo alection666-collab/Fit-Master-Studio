@@ -9,21 +9,54 @@ $$("[data-tab]").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.tab
 $$("[data-goto]").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.goto)));
 const imageCache = new Map();
 async function findExerciseImage(e){
- if(imageCache.has(e.id))return imageCache.get(e.id);
- const fallback=e.image && !e.image.includes("unsplash.com") ? e.image : "";
+ if(imageCache.has(e.id)) return imageCache.get(e.id);
+ const query=(e.imageQuery||e.name+" exercise").replace(/filetype:bitmap/gi,"").trim();
  try{
-  const url="https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrnamespace=6&gsrsearch="+encodeURIComponent((e.imageQuery||e.name+" exercise demonstration")+" filetype:bitmap")+"&gsrlimit=1&prop=imageinfo&iiprop=url&iiurlwidth=900&format=json&origin=*";
-  const r=await fetch(url); if(!r.ok)throw new Error("Commons unavailable");
-  const j=await r.json(); const page=Object.values(j.query?.pages||{})[0];
-  const found=page?.imageinfo?.[0]?.thumburl||page?.imageinfo?.[0]?.url||fallback;
-  imageCache.set(e.id,found);return found;
- }catch(_){imageCache.set(e.id,fallback);return fallback;}
+  const params=new URLSearchParams({
+   action:"query",generator:"search",gsrnamespace:"6",
+   gsrsearch:query+" filetype:bitmap",gsrlimit:"8",
+   prop:"imageinfo",iiprop:"url",iiurlwidth:"1000",
+   format:"json",origin:"*"
+  });
+  const response=await fetch("https://commons.wikimedia.org/w/api.php?"+params.toString(),{method:"GET",mode:"cors",cache:"no-store"});
+  if(!response.ok) throw new Error("Image search failed: "+response.status);
+  const data=await response.json();
+  const pages=Object.values(data.query?.pages||{});
+  const page=pages.find(p=>p.imageinfo?.[0]?.thumburl||p.imageinfo?.[0]?.url);
+  const info=page?.imageinfo?.[0];
+  let src=info?.thumburl||info?.url||"";
+  if(!src&&page?.title){
+   const fileName=page.title.replace(/^File:/i,"");
+   src="https://commons.wikimedia.org/wiki/Special:FilePath/"+encodeURIComponent(fileName)+"?width=1000";
+  }
+  if(!src) throw new Error("No matching image found");
+  imageCache.set(e.id,src);
+  return src;
+ }catch(error){
+  console.warn("FIT MASTER: не удалось загрузить фото для "+e.name,error);
+  imageCache.set(e.id,"");
+  return "";
+ }
 }
 function hydrateExerciseImages(root=document){
  root.querySelectorAll("img[data-exercise-id]").forEach(async img=>{
   const e=EXERCISES.find(x=>x.id===img.dataset.exerciseId);if(!e)return;
-  const src=await findExerciseImage(e);if(src&&img.isConnected){img.src=src;img.classList.remove("image-pending");}
-  else if(img.isConnected){img.alt="Фото упражнения пока недоступно";img.classList.add("image-unavailable");}
+  const src=await findExerciseImage(e);
+  if(!img.isConnected)return;
+  if(src){
+   img.onload=()=>{img.classList.remove("image-pending","image-unavailable");};
+   img.onerror=()=>{
+    img.onerror=null;
+    img.classList.remove("image-pending");
+    img.classList.add("image-unavailable");
+    img.alt="Не удалось открыть изображение. Нажми на видео с техникой.";
+   };
+   img.src=src;
+  }else{
+   img.alt="Фото для этого упражнения пока не найдено";
+   img.classList.remove("image-pending");
+   img.classList.add("image-unavailable");
+  }
  });
 }
 function renderCatalog(){
