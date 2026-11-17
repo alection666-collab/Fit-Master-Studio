@@ -61,27 +61,18 @@ body{font-size:16px}
 .anatomy{height:100%;max-width:100%;overflow:visible}
 .anatomy .torso{fill:#9aa89d;stroke:#d9e1da;stroke-width:1.4}
 .anatomy .limbs{stroke:#aab6ac}
-.anatomy .hot{fill:#ff684f;stroke:#ffb19f;stroke-width:1;opacity:.95;filter:drop-shadow(0 0 5px #ff563e);animation:musclePulse 1.15s ease-in-out infinite alternate}
+.anatomy .hot{fill:#ff684f;stroke:#ffb19f;stroke-width:1;opacity:.95;filter:drop-shadow(0 0 5px #ff563e);}
 .anatomy .prop{fill:none;stroke:#a8b9ad;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;opacity:.72}
 .anatomy .water{stroke:#4bc7dc;stroke-width:3}
 .muscle-caption{display:flex;align-items:center;gap:7px;max-width:100%;color:#ffb5a7;font-size:10px;font-weight:700;text-align:center;line-height:1.25;padding:4px 2px}
-.muscle-caption .pulse-dot{flex:0 0 7px;width:7px;height:7px;border-radius:50%;background:#ff684f;box-shadow:0 0 9px #ff684f;animation:musclePulse .8s infinite alternate}
-.motion-chest .body{transform-origin:100px 110px;animation:pressMove 2s ease-in-out infinite}
-.motion-back .body{transform-origin:100px 95px;animation:rowMove 2s ease-in-out infinite}
-.motion-legs .body{transform-origin:100px 130px;animation:squatMove 2.2s ease-in-out infinite}
-.motion-shoulders .body{transform-origin:100px 85px;animation:raiseMove 2s ease-in-out infinite}
-.motion-arms .body{transform-origin:100px 85px;animation:curlMove 1.8s ease-in-out infinite}
-.motion-core .body{transform-origin:100px 110px;animation:coreMove 2.2s ease-in-out infinite}
-.motion-pool .body{transform-origin:100px 110px;animation:swimMove 2.2s ease-in-out infinite}
-@keyframes musclePulse{from{opacity:.48}to{opacity:1}}
-@keyframes pressMove{0%,100%{transform:translateY(5px) scaleY(.97)}50%{transform:translateY(-5px) scaleY(1.02)}}
-@keyframes rowMove{0%,100%{transform:translateX(-4px)}50%{transform:translateX(5px)}}
-@keyframes squatMove{0%,100%{transform:translateY(-2px) scaleY(1)}50%{transform:translateY(12px) scaleY(.91)}}
-@keyframes raiseMove{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(5deg)}}
-@keyframes curlMove{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(5deg)}}
-@keyframes coreMove{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
-@keyframes swimMove{0%,100%{transform:translateY(2px) rotate(-3deg)}50%{transform:translateY(-4px) rotate(3deg)}}
-@media(prefers-reduced-motion:reduce){.anatomy .hot,.muscle-caption .pulse-dot,.motion-stage .body{animation:none!important}}
+.muscle-caption .pulse-dot{flex:0 0 7px;width:7px;height:7px;border-radius:50%;background:#ff684f;box-shadow:0 0 9px #ff684f;}
+.motion-chest .body{transform-origin:100px 110px;}
+.motion-back .body{transform-origin:100px 95px;}
+.motion-legs .body{transform-origin:100px 130px;}
+.motion-shoulders .body{transform-origin:100px 85px;}
+.motion-arms .body{transform-origin:100px 85px;}
+.motion-core .body{transform-origin:100px 110px;}
+.motion-pool .body{transform-origin:100px 110px;}
 @media(max-width:700px){.motion-stage{height:100px}.muscle-caption{font-size:9px}}
 .modal-image .motion-stage{height:210px}
 
@@ -92,26 +83,18 @@ body{font-size:16px}
 .side-anatomy .limb{fill:none;stroke:#aebbb1;stroke-width:11;stroke-linecap:round;stroke-linejoin:round}
 .side-anatomy .arm-far{stroke:#849389;stroke-width:8}
 .side-anatomy .hand,.side-anatomy .foot{fill:none;stroke:#d6ded7;stroke-width:5;stroke-linecap:round}
-.side-anatomy .hot{fill:#ff5945;stroke:#ffad9d;stroke-width:1;opacity:.95;filter:drop-shadow(0 0 5px #ff5945);animation:musclePulse 1s ease-in-out infinite alternate}
+.side-anatomy .hot{fill:#ff5945;stroke:#ffad9d;stroke-width:1;opacity:.95;filter:drop-shadow(0 0 5px #ff5945);}
 .side-anatomy .prop{fill:none;stroke:#9cac9f;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;opacity:.72}
 .side-anatomy .prop.thin{stroke-width:2.5;stroke-dasharray:3 3}
 .side-anatomy .water{stroke:#4bc7dc;stroke-width:3}
 .side-anatomy .machine-props{transform-origin:center}
-.motion-chest .side-anatomy .body{transform-origin:100px 100px;animation:sidePress 2s ease-in-out infinite}
-.motion-back .side-anatomy .body{transform-origin:100px 100px;animation:sideRow 2s ease-in-out infinite}
-.motion-legs .side-anatomy .body{transform-origin:100px 125px;animation:sideSquat 2.2s ease-in-out infinite}
-.motion-shoulders .side-anatomy .body{transform-origin:100px 90px;animation:sideRaise 2s ease-in-out infinite}
-.motion-arms .side-anatomy .body{transform-origin:100px 90px;animation:sideCurl 1.8s ease-in-out infinite}
-.motion-core .side-anatomy .body{transform-origin:100px 110px;animation:sideCore 2.2s ease-in-out infinite}
-.motion-pool .side-anatomy .body{transform-origin:100px 110px;animation:sideSwim 2.2s ease-in-out infinite}
-@keyframes sidePress{0%,100%{transform:translateX(-3px)}50%{transform:translateX(5px)}}
-@keyframes sideRow{0%,100%{transform:translateX(5px)}50%{transform:translateX(-5px)}}
-@keyframes sideSquat{0%,100%{transform:translateY(0) scaleY(1)}50%{transform:translateY(9px) scaleY(.94)}}
-@keyframes sideRaise{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(5deg)}}
-@keyframes sideCurl{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(7deg)}}
-@keyframes sideCore{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
-@keyframes sideSwim{0%,100%{transform:translateY(2px) rotate(-3deg)}50%{transform:translateY(-3px) rotate(3deg)}}
-@media(prefers-reduced-motion:reduce){.side-anatomy .hot,.side-anatomy .body{animation:none!important}}
+.motion-chest .side-anatomy .body{transform-origin:100px 100px;}
+.motion-back .side-anatomy .body{transform-origin:100px 100px;}
+.motion-legs .side-anatomy .body{transform-origin:100px 125px;}
+.motion-shoulders .side-anatomy .body{transform-origin:100px 90px;}
+.motion-arms .side-anatomy .body{transform-origin:100px 90px;}
+.motion-core .side-anatomy .body{transform-origin:100px 110px;}
+.motion-pool .side-anatomy .body{transform-origin:100px 110px;}
 
 /* v2.0 — unified dark technical exercise plate style */
 .exercise-visual{background:radial-gradient(ellipse at 50% 42%,#25282c 0%,#101114 78%)!important;border:1px solid #41444a;border-radius:12px;padding:7px 9px!important}
