@@ -67,7 +67,7 @@ function exerciseVisual(e, extraClass=""){
  };
  const p=poses[e.id]||poses.plank;
  const gear=equipment[e.id]||'<path class="prop" d="M28 180H172"/>';
- const EXERCISE_IMAGE_MAP={"bench":"bench-press","chestpress":"chest-press-machine","latpull":"lat-pulldown","row":"seated-cable-row","squat":"goblet-squat","legpress":"leg-press","shoulder":"dumbbell-shoulder-press","lateral":"lateral-raises","curl":"biceps-curl","legextension":"leg-extension","legcurl":"leg-curl","hipabduction":"hip-abduction-machine","pecdeck":"pec-deck","smithsquat":"smith-machine-squat","assistedpullup":"assisted-pull-up","calfraise":"seated-calf-raise"};
+ const EXERCISE_IMAGE_MAP={"plank":"plank","tricepspushdown":"tricep-pushdowns","bench":"bench-press","chestpress":"chest-press-machine","latpull":"lat-pulldown","row":"seated-cable-row","squat":"goblet-squat","legpress":"leg-press","shoulder":"dumbbell-shoulder-press","lateral":"lateral-raises","curl":"biceps-curl","legextension":"leg-extension","legcurl":"leg-curl","hipabduction":"hip-abduction-machine","pecdeck":"pec-deck","smithsquat":"smith-machine-squat","assistedpullup":"assisted-pull-up","calfraise":"seated-calf-raise"};
  const imageId=EXERCISE_IMAGE_MAP[e.id];
  const imageBase=imageId?'https://raw.githubusercontent.com/MarvinNazari/exercise-images/main/images/'+imageId+'/':'';
  const photo=imageId?'<img class="exercise-photo" src="'+imageBase+'start.webp" data-end="'+imageBase+'end.webp" alt="Техника: '+safe(e.name)+'" loading="lazy" decoding="async">':'';
