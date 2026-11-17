@@ -78,14 +78,46 @@ function exerciseVisual(e, extraClass=""){
  const gear=equipment[e.id]||'<path class="prop" d="M28 180H172"/>';
  const pool=e.type==="pool";
  const water=pool?'<path class="prop water" d="M8 145Q26 137 44 145T80 145T116 145T152 145T192 145M8 165Q26 157 44 165T80 165T116 165T152 165T192 165"/>' : '';
- return '<div class="exercise-visual '+extraClass+' exercise-'+safe(e.id)+'"><svg class="anatomy side-anatomy exercise-inline-svg" viewBox="0 0 200 210" role="img" aria-label="Иллюстрация упражнения '+safe(e.name)+'. Работающие мышцы: '+safe(muscleNames)+'"><g class="machine-props">'+gear+water+'</g><g class="body">'+p.body+p.hot+'</g></svg><div class="muscle-caption"><span class="pulse-dot"></span><span>'+safe(muscleNames)+'</span></div></div>';
+ const EXERCISE_IMAGE_MAP={"bench":"bench-press","chestpress":"chest-press-machine","latpull":"lat-pulldown","row":"seated-cable-row","squat":"goblet-squat","legpress":"leg-press","shoulder":"dumbbell-shoulder-press","lateral":"lateral-raises","curl":"biceps-curl","plank":"plank","legextension":"leg-extension","legcurl":"leg-curl","hipabduction":"hip-abduction-machine","pecdeck":"pec-deck","smithsquat":"smith-machine-squat","assistedpullup":"assisted-pull-up","calfraise":"seated-calf-raise"};
+ const imageId=EXERCISE_IMAGE_MAP[e.id];
+ const imageBase=imageId?'https://raw.githubusercontent.com/MarvinNazari/exercise-images/main/images/'+imageId+'/':'';
+ const photo=imageId?'<img class="exercise-photo" src="'+imageBase+'start.webp" data-end="'+imageBase+'end.webp" alt="Техника: '+safe(e.name)+'" loading="lazy" decoding="async">':'';
+ return '<div class="exercise-visual '+extraClass+' exercise-'+safe(e.id)+'">'+photo+'<div class="exercise-vector-fallback"><svg class="anatomy side-anatomy exercise-inline-svg" viewBox="0 0 200 210" role="img" aria-label="Схема упражнения '+safe(e.name)+'. Работающие мышцы: '+safe(muscleNames)+'"><g class="machine-props">'+gear+water+'</g><g class="body">'+p.body+p.hot+'</g></svg></div><div class="muscle-caption"><span class="pulse-dot"></span><span>'+safe(muscleNames)+'</span></div></div>';
 }
+
+// Надёжная загрузка иллюстраций: основной raw GitHub + резервный jsDelivr.
+// Если обе сети недоступны, остаётся встроенная схема упражнения.
+function mountExerciseMedia(root=document){
+ root.querySelectorAll(".exercise-photo").forEach(img=>{
+  if(img.dataset.mediaBound)return;
+  img.dataset.mediaBound="1";
+  const raw=img.getAttribute("src");
+  const endRaw=img.dataset.end;
+  const cdn=u=>u.replace("https://raw.githubusercontent.com/MarvinNazari/exercise-images/main/","https://cdn.jsdelivr.net/gh/MarvinNazari/exercise-images@main/");
+  let failedHosts=0, showingEnd=false, timer=null;
+  const card=img.closest(".exercise-visual");
+  img.addEventListener("load",()=>{
+   card.classList.add("media-loaded");
+   if(!timer && endRaw){timer=setInterval(()=>{
+    showingEnd=!showingEnd;
+    img.src=(showingEnd?endRaw:raw);
+   },1700);}
+  });
+  img.addEventListener("error",()=>{
+   if(failedHosts===0){failedHosts=1;img.src=cdn(showingEnd?endRaw:raw);}
+   else {if(timer)clearInterval(timer);img.remove();card.classList.remove("media-loaded");}
+  });
+  if(img.complete && img.naturalWidth)img.dispatchEvent(new Event("load"));
+ });
+}
+
 function renderCatalog(){
  const q=$("#searchInput").value.toLowerCase();
  const list=EXERCISES.filter(e=>(activeFilter==="all"||e.type===activeFilter)&&(`${e.name} ${e.machine} ${e.category} ${e.muscles.join(" ")}`).toLowerCase().includes(q));
  $("#catalogCount").textContent=list.length;
  $("#exerciseGrid").innerHTML=list.map(e=>`<article class="exercise-card" data-id="${e.id}"><div class="exercise-image">${exerciseVisual(e)}<span class="muscle-tag">${e.category.toUpperCase()}</span></div><div class="exercise-info"><h3>${e.name}</h3><p>${e.machine} · ${e.muscles.slice(0,2).join(", ")}</p><a class="card-video-link" href="${e.video}" target="_blank" rel="noopener" aria-label="Видео: ${e.name}" onclick="event.stopPropagation()">▶ Видео с техникой</a><div class="card-bottom"><span>${e.sets} подхода · ${e.reps}</span><b>Подробнее ↗</b></div></div></article>`).join("") || '<p class="text-sm text-gray-400">Ничего не найдено. Попробуй изменить запрос.</p>';
  $(".exercise-card").forEach(c=>c.addEventListener("click",()=>openExercise(c.dataset.id)));
+ mountExerciseMedia($("#exerciseGrid"));
  
 }
 $("#searchInput").addEventListener("input",renderCatalog);
@@ -95,6 +127,7 @@ function openExercise(id){
  $("#modalContent").innerHTML=`<div class="modal-video-top"><a class="video-link video-link-primary" target="_blank" rel="noopener" href="${e.video}">▶ СМОТРЕТЬ ВИДЕО ТЕХНИКИ НА YOUTUBE</a></div>${exerciseVisual(e,"modal-image")}<div class="eyebrow">${e.category.toUpperCase()} · ${e.machine}</div><h2>${e.name}</h2><div class="muscle-pills">${e.muscles.map(m=>`<span>${m}</span>`).join("")}</div>${e.machineDescription?`<div class="detail-panel"><h4>О ТРЕНАЖЁРЕ / УПРАЖНЕНИИ</h4><p>${e.machineDescription}</p><p><b>Назначение:</b> ${e.purpose||""}</p><p><b>Настройка:</b> ${e.setup||""}</p></div>`:""}<h4>ТЕХНИКА ВЫПОЛНЕНИЯ</h4><ol>${e.steps.map(s=>`<li>${s}</li>`).join("")}</ol>${e.mistakes?`<div class="detail-panel"><h4>ЧАСТЫЕ ОШИБКИ</h4><ul>${e.mistakes.map(m=>`<li>${m}</li>`).join("")}</ul></div>`:""}<p><b>Ориентир:</b> ${e.sets} подхода · ${e.reps} · отдых ${e.rest} сек.</p>${e.imagePage?`<p class="image-credit">Фото: <a href="${e.imagePage}" target="_blank" rel="noopener">${e.imageCredit||"Источник изображения"}</a> · ${e.imageLicense||""}</p>`:""}<div class="modal-actions"><button class="btn-secondary" id="addExercise">Добавить в мой план</button></div>`;
 
  $("#exerciseModal").classList.remove("hidden");
+ mountExerciseMedia($("#modalContent"));
  $("#addExercise").addEventListener("click",()=>{if(!currentPlan)currentPlan={title:"Мой список упражнений",days:[{name:"Избранные упражнения",items:[]}]};if(!currentPlan.days[0].items.some(x=>x.id===e.id))currentPlan.days[0].items.push({...e,weight:"—"});savePlan();$("#exerciseModal").classList.add("hidden");});
 }
 $$("[data-close]").forEach(b=>b.addEventListener("click",()=>$("#exerciseModal").classList.add("hidden")));
