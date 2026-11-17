@@ -108,3 +108,13 @@ body{font-size:16px}
 .muscle-caption{color:#ffb5a6;font-size:11px}
 .exercise-visual.modal-image{background:#101114!important;border:1px solid #41444a}
 @media(max-width:700px){.muscle-caption{font-size:10px}}
+
+/* v2.3 — internet exercise illustrations + resilient fallback */
+.exercise-visual{position:relative}
+.exercise-photo{position:absolute;inset:0;width:100%;height:calc(100% - 22px);object-fit:contain;padding:5px 12px 0;z-index:1;opacity:0;transition:opacity .25s ease;background:#101114}
+.exercise-visual.media-loaded .exercise-photo{opacity:1}
+.exercise-vector-fallback{position:absolute;inset:0 0 22px;display:grid;place-items:center;z-index:0;width:100%;height:calc(100% - 22px)}
+.exercise-visual.media-loaded .exercise-vector-fallback{opacity:0;visibility:hidden}
+.exercise-visual .muscle-caption{position:absolute;z-index:2;bottom:2px;left:5px;right:5px;min-height:20px;justify-content:center;background:rgba(12,13,15,.72);border-radius:6px}
+.exercise-visual.modal-image .exercise-photo{height:calc(100% - 28px);padding:8px 20px}
+.exercise-visual.modal-image .exercise-vector-fallback{height:calc(100% - 28px)}
