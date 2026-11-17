@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#101714">
   <meta name="description" content="FIT MASTER — каталог тренажёров, техника упражнений и персональный генератор тренировок.">
-  <title>FIT MASTER Studio v2.3 — тренируйся с умом</title>
+  <title>FIT MASTER Studio v2.4 — тренируйся с умом</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="CSS/styles.css?v=2.3">
+  <link rel="stylesheet" href="CSS/styles.css?v=2.4">
 </head>
 <body class="min-h-screen">
   <div class="app-shell">
@@ -43,7 +43,7 @@
           <div class="hero-visual"><img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1100&q=85" alt="Современный тренажёрный зал"><div class="hero-float"><b>01</b><span>Тренируйся<br>с пониманием</span></div></div>
         </div>
         <div class="section-head"><div><div class="eyebrow">БАЗА ЗНАНИЙ</div><h2>Тренажёры и упражнения</h2><p>Выбери категорию и найди нужное движение.</p></div><div class="catalog-count"><b id="catalogCount">28</b><span>УПРАЖНЕНИЙ</span></div></div>
-        <div class="filter-row"><div class="search-box"><span>⌕</span><input id="searchInput" placeholder="Поиск тренажёра или упражнения..."></div><div class="filter-chips" id="filters"><button class="chip active" data-filter="all">Все</button><button class="chip" data-filter="chest">Грудь</button><button class="chip" data-filter="back">Спина</button><button class="chip" data-filter="legs">Ноги</button><button class="chip" data-filter="shoulders">Плечи</button><button class="chip" data-filter="glutes">Ягодицы</button><button class="chip" data-filter="arms">Руки</button><button class="chip" data-filter="core">Кор</button><button class="chip" data-filter="pool">Бассейн</button></div></div>
+        <div class="filter-row"><div class="search-box"><span>⌕</span><input id="searchInput" placeholder="Поиск тренажёра или упражнения..."></div><div class="filter-chips" id="filters"><button class="chip active" data-filter="all">Все</button><button class="chip" data-filter="chest">Грудь</button><button class="chip" data-filter="back">Спина</button><button class="chip" data-filter="legs">Ноги</button><button class="chip" data-filter="shoulders">Плечи</button><button class="chip" data-filter="glutes">Ягодицы</button><button class="chip" data-filter="arms">Руки</button><button class="chip" data-filter="core">Кор</button></div></div>
         <div id="exerciseGrid" class="exercise-grid"></div>
       </section>
 
@@ -63,14 +63,26 @@
             <label class="full-field">Уровень подготовки<select id="level"><option value="beginner">Новичок — до 6 месяцев</option><option value="intermediate" selected>Средний — 6–24 месяца</option><option value="advanced">Опытный — более 2 лет</option></select></label>
             <label class="full-field">Главная цель<select id="goal"><option value="fat">Похудение</option><option value="mass" selected>Набор мышечной массы</option><option value="tone">Рельеф</option><option value="maintain">Поддержание формы</option></select></label>
             <div class="form-divider"></div>
-            <div class="card-title"><span class="number">03</span><div><h3>Доступный инвентарь</h3><p>Отметь то, что есть в твоём распоряжении</p></div></div>
+            <div class="card-title"><span class="number">03</span><div><h3>Проблемные зоны и фокус</h3><p>Отметь области, которым хочешь уделить больше внимания</p></div></div>
+            <div class="zone-options">
+              <label class="check-option"><input type="checkbox" name="problemZone" value="chest"><span>Грудь</span></label>
+              <label class="check-option"><input type="checkbox" name="problemZone" value="back"><span>Спина</span></label>
+              <label class="check-option"><input type="checkbox" name="problemZone" value="shoulders"><span>Плечи</span></label>
+              <label class="check-option"><input type="checkbox" name="problemZone" value="arms"><span>Руки</span></label>
+              <label class="check-option"><input type="checkbox" name="problemZone" value="abdomen"><span>Живот / мышцы кора</span></label>
+              <label class="check-option"><input type="checkbox" name="problemZone" value="glutes"><span>Ягодицы</span></label>
+              <label class="check-option"><input type="checkbox" name="problemZone" value="thighs"><span>Бёдра</span></label>
+              <label class="check-option"><input type="checkbox" name="problemZone" value="calves"><span>Икры</span></label>
+            </div>
+            <p class="zone-note">Выбранные зоны получат дополнительный объём упражнений. Локально убрать жир только в одной области невозможно — программа укрепляет мышцы, а снижение жира зависит от общего энергобаланса.</p>
+            <div class="form-divider"></div>
+            <div class="card-title"><span class="number">04</span><div><h3>Доступный инвентарь</h3><p>Отметь то, что есть в твоём распоряжении</p></div></div>
             <div class="equipment-options">
               <label class="check-option"><input type="checkbox" name="equipment" value="gym" checked><span>🏋️ Тренажёрный зал</span></label>
               <label class="check-option"><input type="checkbox" name="equipment" value="dumbbells" checked><span>◈ Гантели</span></label>
               <label class="check-option"><input type="checkbox" name="equipment" value="barbell"><span>▰ Штанга</span></label>
               <label class="check-option"><input type="checkbox" name="equipment" value="bands"><span>〰 Резинки</span></label>
               <label class="check-option"><input type="checkbox" name="equipment" value="body"><span>◎ Собственный вес</span></label>
-              <label class="check-option"><input type="checkbox" name="equipment" value="pool"><span>〰 Бассейн</span></label>
             </div>
             <button class="btn-primary generate-btn" type="submit">Сгенерировать программу <span>↗</span></button>
             <p class="disclaimer">Расчётные значения — стартовые ориентиры, а не медицинское назначение. Подбирай вес без боли и с сохранением техники.</p>
