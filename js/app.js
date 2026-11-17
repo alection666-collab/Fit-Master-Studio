@@ -11,6 +11,8 @@ $$("[data-goto]").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.go
 function exerciseVisual(e, extraClass=""){
  const safe=s=>String(s||"").replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
  const muscleNames=(e.muscles||[]).slice(0,3).join(" · ");
+  const muscleGroup=({chest:"chest",back:"back",legs:"legs",shoulders:"shoulders",glutes:"glutes",arms:"arms",core:"core"})[e.type]||"core";
+  const primaryMuscle=(e.muscles||[])[0]||e.category;
   const equipment={
  bench:'<path class="prop" d="M25 151H172M48 151L40 190M145 151L155 190M55 133H137M61 133L54 145M130 133L138 145M28 48H172M38 39V58M162 39V58M28 48V151M172 48V151"/>',
  chestpress:'<path class="prop" d="M34 34V184M34 34H154L170 51V184M34 184H170M52 82H120M52 82V117M120 82V117M120 82L144 65M144 65V106M52 117H120M72 117V147M48 147H142"/>',
@@ -54,8 +56,6 @@ function exerciseVisual(e, extraClass=""){
  lateral:{body:'<circle class="head" cx="101" cy="45" r="10"/><path class="torso" d="M88 58Q102 53 115 61L117 108L86 108Z"/><path class="limb" d="M90 67L66 64L43 65M113 67L137 64L160 65M90 108L84 145L80 171M113 108L120 145L126 171"/>',hot:'<ellipse class="hot" cx="88" cy="66" rx="10" ry="9"/><ellipse class="hot" cx="115" cy="66" rx="10" ry="9"/>'},
  curl:{body:'<circle class="head" cx="101" cy="44" r="10"/><path class="torso" d="M88 57Q102 52 115 60L117 108L86 108Z"/><path class="limb" d="M90 68L81 93L93 102L96 79M113 68L122 93L110 102L108 79M90 108L84 145L80 171M113 108L120 145L126 171"/>',hot:'<path class="hot" d="M81 80L94 91L100 82L94 70Z"/><path class="hot" d="M121 80L108 91L102 82L108 70Z"/>'},
  plank:{body:'<circle class="head" cx="38" cy="106" r="9"/><path class="torso" d="M48 101L104 103L110 113L48 112Z"/><path class="limb" d="M53 109L40 132L29 132M102 109L126 120L150 119M105 110L135 130L164 130"/>',hot:'<path class="hot" d="M49 102L105 104L108 112L49 110Z"/>'},
- swim:{body:'<circle class="head" cx="37" cy="101" r="8"/><path class="torso" d="M46 98L104 99L120 107L52 108Z"/><path class="limb" d="M58 100L75 77L96 70M76 104L102 119L124 120M105 103L137 94L157 100M103 106L133 118L156 115"/>',hot:'<path class="hot" d="M53 98L106 100L118 107L54 107Z"/>'},
- kick:{body:'<circle class="head" cx="37" cy="103" r="8"/><path class="torso" d="M47 100L107 101L120 109L51 110Z"/><path class="limb" d="M55 102L73 87L91 86M57 108L76 122L98 123M105 103L133 94L156 98M105 108L135 119L159 116"/>',hot:'<path class="hot" d="M102 103L135 94L157 98L160 105L134 106Z"/>'},
  legextension:{body:'<circle class="head" cx="78" cy="51" r="9"/><path class="torso" d="M72 63L101 65L108 104L74 105Z"/><path class="limb" d="M76 73L60 91L52 110M102 74L119 91L132 109M82 103L78 133L100 139L130 139L155 139M105 104L116 130L133 139"/>',hot:'<path class="hot" d="M83 105L105 106L124 134L151 134L152 144L121 145L99 124Z"/>'},
  legcurl:{body:'<circle class="head" cx="43" cy="99" r="9"/><path class="torso" d="M53 95L111 96L118 108L54 108Z"/><path class="limb" d="M60 100L50 123L37 129M108 104L133 119L151 115L163 96M107 106L130 124L145 143L163 131"/>',hot:'<path class="hot" d="M105 104L134 118L151 112L162 95L169 101L158 126L132 133L109 116Z"/>'},
  hipabduction:{body:'<circle class="head" cx="101" cy="48" r="9"/><path class="torso" d="M88 60Q101 55 114 62L117 105L85 105Z"/><path class="limb" d="M90 71L76 90L72 104M112 71L126 90L130 104M91 104L72 127L46 135M111 104L130 127L156 135"/>',hot:'<path class="hot" d="M87 100L115 100L136 125L153 131L149 141L124 137L101 119L76 137L48 141L45 132L72 124Z"/>'},
@@ -64,15 +64,6 @@ function exerciseVisual(e, extraClass=""){
  assistedpullup:{body:'<circle class="head" cx="101" cy="65" r="9"/><path class="torso" d="M88 77Q101 70 114 78L117 113L85 113Z"/><path class="limb" d="M90 83L78 55L75 28M112 83L124 55L127 28M90 113L83 140L81 158M112 113L119 140L121 158"/>',hot:'<path class="hot" d="M87 79Q101 71 115 80L113 105L88 105Z"/>'},
  tricepspushdown:{body:'<circle class="head" cx="101" cy="45" r="9"/><path class="torso" d="M88 57Q101 52 114 59L117 107L85 107Z"/><path class="limb" d="M90 67L111 78L122 102L124 126M113 67L129 83L139 104L139 126M90 107L83 145L79 170M112 107L120 145L126 170"/>',hot:'<path class="hot" d="M111 78L123 98L128 123L120 125L113 102L104 86Z"/>'},
  calfraise:{body:'<circle class="head" cx="101" cy="42" r="9"/><path class="torso" d="M88 55Q101 50 114 57L117 104L85 104Z"/><path class="limb" d="M91 104L88 140L94 165L85 169M111 104L114 140L108 165L118 169M88 140L82 148M114 140L121 148"/>',hot:'<path class="hot" d="M83 136L96 137L99 162L88 166Z"/><path class="hot" d="M106 137L119 136L117 166L106 162Z"/>'},
- backstroke:{body:'<circle class="head" cx="39" cy="105" r="8"/><path class="torso" d="M49 101L107 102L119 110L52 111Z"/><path class="limb" d="M61 103L79 82L89 57M78 106L101 122L125 122M105 104L129 90L149 83M105 108L134 117L158 113"/>',hot:'<path class="hot" d="M51 101L108 102L118 109L52 110Z"/>'},
- breaststroke:{body:'<circle class="head" cx="37" cy="101" r="8"/><path class="torso" d="M46 98L104 99L118 107L51 108Z"/><path class="limb" d="M59 101L77 85L96 91L108 102M77 105L96 120L111 112L124 101M105 103L132 113L155 116M105 107L131 121L154 124"/>',hot:'<path class="hot" d="M53 98L106 100L118 107L54 107Z"/>'},
- kickboardback:{body:'<circle class="head" cx="39" cy="104" r="8"/><path class="torso" d="M49 100L106 101L119 109L52 110Z"/><path class="limb" d="M58 103L75 88L93 88M60 108L79 120L98 120M105 104L130 95L153 97M105 108L131 118L154 116"/>',hot:'<path class="hot" d="M104 103L132 94L155 97L157 105L132 107Z"/>'},
- dolphinkick:{body:'<circle class="head" cx="37" cy="103" r="8"/><path class="torso" d="M47 99Q75 92 105 103L119 109L50 111Z"/><path class="limb" d="M57 102L80 87L103 89M105 106L130 113L151 102L169 115M106 109L130 119L151 129L168 118"/>',hot:'<path class="hot" d="M104 104L132 112L154 103L170 114L162 124L134 130L107 117Z"/>'},
- waterjog:{body:'<circle class="head" cx="101" cy="42" r="9"/><path class="torso" d="M88 55Q101 50 114 57L117 105L85 105Z"/><path class="limb" d="M89 67L72 84L66 103M113 67L130 83L136 102M90 105L78 127L96 144L83 164M112 105L129 124L111 143L127 162"/>',hot:'<path class="hot" d="M88 104L115 104L130 128L112 145L96 130L76 128Z"/>'},
- aquajacks:{body:'<circle class="head" cx="101" cy="43" r="9"/><path class="torso" d="M88 56Q101 51 114 58L117 105L85 105Z"/><path class="limb" d="M89 67L67 48L48 34M113 67L135 48L154 34M90 105L69 127L48 148M112 105L133 127L154 148"/>',hot:'<path class="hot" d="M88 103L115 103L135 128L155 147L146 155L116 135L100 119L84 135L55 155L47 147L68 126Z"/>'},
- noodlepress:{body:'<circle class="head" cx="101" cy="43" r="9"/><path class="torso" d="M88 56Q101 51 114 58L117 105L85 105Z"/><path class="limb" d="M89 68L93 92L100 109M113 68L109 92L103 109M90 105L83 143L80 168M112 105L119 143L125 168"/>',hot:'<path class="hot" d="M88 103L115 103L117 124L85 124Z"/>'},
- sculling:{body:'<circle class="head" cx="101" cy="43" r="9"/><path class="torso" d="M88 56Q101 51 114 58L117 105L85 105Z"/><path class="limb" d="M89 68L70 83L54 89M113 68L132 83L148 89M90 105L83 143L80 168M112 105L119 143L125 168"/>',hot:'<path class="hot" d="M89 67L98 72L77 91L68 86Z"/><path class="hot" d="M113 67L104 72L125 91L134 86Z"/>'},
- sidekick:{body:'<circle class="head" cx="38" cy="101" r="8"/><path class="torso" d="M48 98L106 99L119 107L51 108Z"/><path class="limb" d="M58 101L75 86L93 86M59 107L78 120L99 120M106 103L132 89L158 77M106 108L132 120L157 128"/>',hot:'<path class="hot" d="M105 102L132 88L159 76L164 83L137 104L109 114Z"/>'}
  };
  const p=poses[e.id]||poses.plank;
  const gear=equipment[e.id]||'<path class="prop" d="M28 180H172"/>';
@@ -82,7 +73,7 @@ function exerciseVisual(e, extraClass=""){
  const imageId=EXERCISE_IMAGE_MAP[e.id];
  const imageBase=imageId?'https://raw.githubusercontent.com/MarvinNazari/exercise-images/main/images/'+imageId+'/':'';
  const photo=imageId?'<img class="exercise-photo" src="'+imageBase+'start.webp" data-end="'+imageBase+'end.webp" alt="Техника: '+safe(e.name)+'" loading="lazy" decoding="async">':'';
- return '<div class="exercise-visual '+extraClass+' exercise-'+safe(e.id)+'">'+photo+'<div class="exercise-vector-fallback"><svg class="anatomy side-anatomy exercise-inline-svg" viewBox="0 0 200 210" role="img" aria-label="Схема упражнения '+safe(e.name)+'. Работающие мышцы: '+safe(muscleNames)+'"><g class="machine-props">'+gear+water+'</g><g class="body">'+p.body+p.hot+'</g></svg></div><div class="muscle-caption"><span class="pulse-dot"></span><span>'+safe(muscleNames)+'</span></div></div>';
+ return '<div data-muscle-group="'+muscleGroup+'" class="exercise-visual '+extraClass+' exercise-'+safe(e.id)+'">'+photo+'<div class="exercise-vector-fallback"><svg class="anatomy side-anatomy exercise-inline-svg" viewBox="0 0 200 210" role="img" aria-label="Схема упражнения '+safe(e.name)+'. Работающие мышцы: '+safe(muscleNames)+'"><g class="machine-props">'+gear+'</g><g class="body">'+p.body+p.hot+'</g></svg></div><div class="muscle-caption"><span class="pulse-dot"></span><span class="primary-muscle">'+safe(primaryMuscle)+'</span><span class="secondary-muscles">'+safe((e.muscles||[]).slice(1,3).join(" · "))+'</span></div></div>';
 }
 
 // Надёжная загрузка иллюстраций: основной raw GitHub + резервный jsDelivr.
@@ -135,10 +126,8 @@ $("#exerciseModal").addEventListener("click",e=>{if(e.target.classList.contains(
 function getSelectedEquipment(){return $$('input[name="equipment"]:checked').map(x=>x.value)}
 function buildProgram(p){
  const available=EXERCISES.filter(e=>{
-  if(e.type==="pool")return p.equipment.includes("pool");
   if(e.machine==="Гантели")return p.equipment.includes("dumbbells")||p.equipment.includes("gym");
   if(e.machine==="Собственный вес")return p.equipment.includes("body")||p.equipment.includes("gym");
-  if(e.machine==="Бассейн")return p.equipment.includes("pool");
   return p.equipment.includes("gym")||p.equipment.includes("barbell");
  });
  let groups;
@@ -154,13 +143,13 @@ function buildProgram(p){
   const base=(p.weight*(e.type==="legs"?.35:e.type==="back"?.22:.16));
   const kg=Math.max(1,Math.round(base*levelFactor/2.5)*2.5);
   const sets=p.level==="beginner"?2:goalSets;
-  return {...e,sets,reps:e.type==="pool"?e.reps:goalReps,rest:e.type==="pool"?e.rest:rest,weight:e.type==="pool"?"Без отягощения":`${kg} кг*`};
+  return {...e,sets,reps:goalReps,rest,weight:`${kg} кг*`};
  })}));
  return {title:`Программа: ${({fat:"Похудение",mass:"Набор массы",tone:"Рельеф",maintain:"Поддержание формы"})[p.goal]}`,profile:p,days,created:new Date().toLocaleDateString("ru-RU"),note:"* Оценка стартового рабочего веса условная. Начни с лёгкого веса, оставляй 2–3 повтора в запасе и корректируй нагрузку по технике и самочувствию."};
 }
 $("#profileForm").addEventListener("submit",e=>{
  e.preventDefault();
- const p={sex:$("#sex").value,age:+$("#age").value,weight:+$("#weight").value,height:+$("#height").value,level:$("#level").value,goal:$("#goal").value,equipment:getSelectedEquipment()};
+ const p={sex:$("#sex").value,age:+$("#age").value,weight:+$("#weight").value,height:+$("#height").value,level:$("#level").value,goal:$("#goal").value,equipment:getSelectedEquipment(),problemZones:$('input[name="problemZone"]:checked').map(x=>x.value)};
  if(!p.equipment.length){alert("Выбери хотя бы один вариант инвентаря.");return;}
  if(p.age<14||p.age>90||p.weight<35||p.weight>250||p.height<130||p.height>220){alert("Проверь введённые параметры.");return;}
  lastGenerated=buildProgram(p);renderGenerated(lastGenerated);
