@@ -78,7 +78,7 @@ function exerciseVisual(e, extraClass=""){
  const gear=equipment[e.id]||'<path class="prop" d="M28 180H172"/>';
  const pool=e.type==="pool";
  const water=pool?'<path class="prop water" d="M8 145Q26 137 44 145T80 145T116 145T152 145T192 145M8 165Q26 157 44 165T80 165T116 165T152 165T192 165"/>' : '';
- return '<div class="exercise-visual '+extraClass+' exercise-'+safe(e.id)+'"><svg class="anatomy exercise-inline-svg" viewBox="0 0 200 210" role="img" aria-label="Иллюстрация упражнения '+safe(e.name)+'. Работающие мышцы: '+safe(muscleNames)+'"><g class="machine-props">'+gear+water+'</g><g class="body">'+p.body+p.hot+'</g></svg><div class="muscle-caption"><span class="pulse-dot"></span><span>'+safe(muscleNames)+'</span></div></div>';
+ return '<div class="exercise-visual '+extraClass+' exercise-'+safe(e.id)+'"><svg class="anatomy side-anatomy exercise-inline-svg" viewBox="0 0 200 210" role="img" aria-label="Иллюстрация упражнения '+safe(e.name)+'. Работающие мышцы: '+safe(muscleNames)+'"><g class="machine-props">'+gear+water+'</g><g class="body">'+p.body+p.hot+'</g></svg><div class="muscle-caption"><span class="pulse-dot"></span><span>'+safe(muscleNames)+'</span></div></div>';
 }
 function renderCatalog(){
  const q=$("#searchInput").value.toLowerCase();
