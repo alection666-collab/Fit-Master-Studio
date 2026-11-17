@@ -84,3 +84,31 @@ body{font-size:16px}
 @media(prefers-reduced-motion:reduce){.anatomy .hot,.muscle-caption .pulse-dot,.motion-stage .body{animation:none!important}}
 @media(max-width:700px){.motion-stage{height:100px}.muscle-caption{font-size:9px}}
 .modal-image .motion-stage{height:210px}
+
+/* v1.9 — боковой вид, стилистика инструкций на тренажёрах */
+.side-anatomy{height:100%;width:auto;max-width:100%;overflow:visible}
+.side-anatomy .head{fill:#d6ded7;stroke:#f0f4f0;stroke-width:1}
+.side-anatomy .torso{fill:#aebbb1;stroke:#e0e8e1;stroke-width:1.5;stroke-linejoin:round}
+.side-anatomy .limb{fill:none;stroke:#aebbb1;stroke-width:11;stroke-linecap:round;stroke-linejoin:round}
+.side-anatomy .arm-far{stroke:#849389;stroke-width:8}
+.side-anatomy .hand,.side-anatomy .foot{fill:none;stroke:#d6ded7;stroke-width:5;stroke-linecap:round}
+.side-anatomy .hot{fill:#ff5945;stroke:#ffad9d;stroke-width:1;opacity:.95;filter:drop-shadow(0 0 5px #ff5945);animation:musclePulse 1s ease-in-out infinite alternate}
+.side-anatomy .prop{fill:none;stroke:#9cac9f;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;opacity:.72}
+.side-anatomy .prop.thin{stroke-width:2.5;stroke-dasharray:3 3}
+.side-anatomy .water{stroke:#4bc7dc;stroke-width:3}
+.side-anatomy .machine-props{transform-origin:center}
+.motion-chest .side-anatomy .body{transform-origin:100px 100px;animation:sidePress 2s ease-in-out infinite}
+.motion-back .side-anatomy .body{transform-origin:100px 100px;animation:sideRow 2s ease-in-out infinite}
+.motion-legs .side-anatomy .body{transform-origin:100px 125px;animation:sideSquat 2.2s ease-in-out infinite}
+.motion-shoulders .side-anatomy .body{transform-origin:100px 90px;animation:sideRaise 2s ease-in-out infinite}
+.motion-arms .side-anatomy .body{transform-origin:100px 90px;animation:sideCurl 1.8s ease-in-out infinite}
+.motion-core .side-anatomy .body{transform-origin:100px 110px;animation:sideCore 2.2s ease-in-out infinite}
+.motion-pool .side-anatomy .body{transform-origin:100px 110px;animation:sideSwim 2.2s ease-in-out infinite}
+@keyframes sidePress{0%,100%{transform:translateX(-3px)}50%{transform:translateX(5px)}}
+@keyframes sideRow{0%,100%{transform:translateX(5px)}50%{transform:translateX(-5px)}}
+@keyframes sideSquat{0%,100%{transform:translateY(0) scaleY(1)}50%{transform:translateY(9px) scaleY(.94)}}
+@keyframes sideRaise{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(5deg)}}
+@keyframes sideCurl{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(7deg)}}
+@keyframes sideCore{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
+@keyframes sideSwim{0%,100%{transform:translateY(2px) rotate(-3deg)}50%{transform:translateY(-3px) rotate(3deg)}}
+@media(prefers-reduced-motion:reduce){.side-anatomy .hot,.side-anatomy .body{animation:none!important}}
