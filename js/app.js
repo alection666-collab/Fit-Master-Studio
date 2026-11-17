@@ -158,7 +158,7 @@ function buildProgram(p){
 }
 $("#profileForm").addEventListener("submit",e=>{
  e.preventDefault();
- const p={sex:$("#sex").value,age:+$("#age").value,weight:+$("#weight").value,height:+$("#height").value,level:$("#level").value,goal:$("#goal").value,equipment:getSelectedEquipment(),problemZones:$("input[name=\"problemZone\"]:checked").map(x=>x.value)};
+ const p={sex:$("#sex").value,age:+$("#age").value,weight:+$("#weight").value,height:+$("#height").value,level:$("#level").value,goal:$("#goal").value,equipment:getSelectedEquipment(),problemZones:$$("input[name=\"problemZone\"]:checked").map(x=>x.value)};
  if(!p.equipment.length){alert("Выбери хотя бы один вариант инвентаря.");return;}
  if(p.age<14||p.age>90||p.weight<35||p.weight>250||p.height<130||p.height>220){alert("Проверь введённые параметры.");return;}
  lastGenerated=buildProgram(p);renderGenerated(lastGenerated);
