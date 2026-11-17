@@ -8,35 +8,49 @@ function showTab(tab){$$(".tab-panel").forEach(x=>x.classList.toggle("active",x.
 $$("[data-tab]").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.tab)));
 $$("[data-goto]").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.goto)));
 const imageCache = new Map();
-async function findExerciseImage(e){
- if(imageCache.has(e.id)) return imageCache.get(e.id);
+let commonsQueue = Promise.resolve();
+let lastCommonsRequest = 0;
+const wait = ms => new Promise(resolve => setTimeout(resolve,ms));
+async function requestCommonsImage(e){
  const query=(e.imageQuery||e.name+" exercise").replace(/filetype:bitmap/gi,"").trim();
- try{
-  const params=new URLSearchParams({
-   action:"query",generator:"search",gsrnamespace:"6",
-   gsrsearch:query+" filetype:bitmap",gsrlimit:"8",
-   prop:"imageinfo",iiprop:"url",iiurlwidth:"1000",
-   format:"json",origin:"*"
-  });
-  const response=await fetch("https://commons.wikimedia.org/w/api.php?"+params.toString(),{method:"GET",mode:"cors",cache:"no-store"});
-  if(!response.ok) throw new Error("Image search failed: "+response.status);
-  const data=await response.json();
-  const pages=Object.values(data.query?.pages||{});
-  const page=pages.find(p=>p.imageinfo?.[0]?.thumburl||p.imageinfo?.[0]?.url);
-  const info=page?.imageinfo?.[0];
-  let src=info?.thumburl||info?.url||"";
-  if(!src&&page?.title){
-   const fileName=page.title.replace(/^File:/i,"");
-   src="https://commons.wikimedia.org/wiki/Special:FilePath/"+encodeURIComponent(fileName)+"?width=1000";
+ const params=new URLSearchParams({
+  action:"query",generator:"search",gsrnamespace:"6",
+  gsrsearch:query+" filetype:bitmap",gsrlimit:"6",
+  prop:"imageinfo",iiprop:"url",iiurlwidth:"1000",
+  format:"json",origin:"*"
+ });
+ const response=await fetch("https://commons.wikimedia.org/w/api.php?"+params.toString(),{
+  method:"GET",mode:"cors",credentials:"omit",cache:"no-store"
+ });
+ if(!response.ok) throw new Error("Wikimedia HTTP "+response.status);
+ const data=await response.json();
+ if(data.error) throw new Error(data.error.info||"Wikimedia API error");
+ const pages=Object.values(data.query?.pages||{});
+ const page=pages.find(p=>p.imageinfo?.[0]?.thumburl||p.imageinfo?.[0]?.url);
+ const info=page?.imageinfo?.[0];
+ const src=info?.thumburl||info?.url||"";
+ if(!src) throw new Error("No image result");
+ return src;
+}
+function findExerciseImage(e){
+ if(imageCache.has(e.id)) return imageCache.get(e.id);
+ const task=commonsQueue.then(async()=>{
+  const gap=900-(Date.now()-lastCommonsRequest);
+  if(gap>0) await wait(gap);
+  lastCommonsRequest=Date.now();
+  try{
+   const src=await requestCommonsImage(e);
+   imageCache.set(e.id,src);
+   return src;
+  }catch(error){
+   console.warn("FIT MASTER: Wikimedia не вернула изображение для "+e.name,error);
+   imageCache.delete(e.id);
+   return "";
   }
-  if(!src) throw new Error("No matching image found");
-  imageCache.set(e.id,src);
-  return src;
- }catch(error){
-  console.warn("FIT MASTER: не удалось загрузить фото для "+e.name,error);
-  imageCache.set(e.id,"");
-  return "";
- }
+ });
+ commonsQueue=task.then(()=>undefined,()=>undefined);
+ imageCache.set(e.id,task);
+ return task;
 }
 function hydrateExerciseImages(root=document){
  root.querySelectorAll("img[data-exercise-id]").forEach(async img=>{
@@ -53,7 +67,7 @@ function hydrateExerciseImages(root=document){
    };
    img.src=src;
   }else{
-   img.alt="Фото для этого упражнения пока не найдено";
+   img.alt="Фото временно недоступно. Обнови страницу позже.";
    img.classList.remove("image-pending");
    img.classList.add("image-unavailable");
   }
