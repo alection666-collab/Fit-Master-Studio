@@ -126,41 +126,39 @@ $("#exerciseModal").addEventListener("click",e=>{if(e.target.classList.contains(
 function getSelectedEquipment(){return $$('input[name="equipment"]:checked').map(x=>x.value)}
 function buildProgram(p){
  const available=EXERCISES.filter(e=>{
-  if(e.machine==="Гантели")return p.equipment.includes("dumbbells")||p.equipment.includes("gym");
+  if(e.machine==="Гантели"||e.machine.includes("гантел"))return p.equipment.includes("dumbbells")||p.equipment.includes("gym");
   if(e.machine==="Собственный вес")return p.equipment.includes("body")||p.equipment.includes("gym");
   return p.equipment.includes("gym")||p.equipment.includes("barbell");
  });
- let groups;
- if(p.level==="beginner")groups=[["Тренировка A — всё тело",["bench","latpull","squat","shoulder","plank"]],["Тренировка B — всё тело",["chestpress","row","legpress","lateral","curl"]]];
- else if(p.level==="intermediate")groups=[["День 1 — Верх тела",["bench","latpull","shoulder","row","curl"]],["День 2 — Низ тела и кор",["squat","legpress","plank"]],["День 3 — Верх тела",["chestpress","row","lateral","curl","plank"]]];
- else groups=[["День 1 — Грудь и плечи",["bench","chestpress","shoulder","lateral"]],["День 2 — Спина и руки",["latpull","row","curl"]],["День 3 — Ноги и кор",["squat","legpress","plank"]],["День 4 — Смешанная",["chestpress","latpull","lateral","plank"]]];
- const zoneExercises={
-   chest:["bench","chestpress","pecdeck"], back:["latpull","row","assistedpullup"],
-   shoulders:["shoulder","lateral"], arms:["curl","tricepspushdown"],
-   abdomen:["plank"], glutes:["hipabduction","squat","legpress","smithsquat"],
-   thighs:["squat","legpress","legextension","legcurl","smithsquat"], calves:["calfraise"]
-  };
-  const focusIds=[...new Set((p.problemZones||[]).flatMap(z=>zoneExercises[z]||[]))];
-  if(focusIds.length){
-   const already=new Set(groups.flatMap(g=>g[1]));
-   const extras=focusIds.filter(id=>available.some(e=>e.id===id)&&!already.has(id));
-   groups=groups.map(([name,ids],index)=>[name,ids.concat(extras.filter((id,i)=>i%groups.length===index))]);
-  }
-  const levelFactor={beginner:.45,intermediate:.60,advanced:.70}[p.level];
- const goalSets={fat:3,mass:4,tone:3,maintain:2}[p.goal];
- const goalReps={fat:"12–15",mass:"6–12",tone:"10–15",maintain:"8–12"}[p.goal];
- const rest={fat:60,mass:120,tone:60,maintain:90}[p.goal];
- const days=groups.map(([name,ids])=>({name,items:ids.map(id=>available.find(e=>e.id===id)).filter(Boolean).map(e=>{
-  const base=(p.weight*(e.type==="legs"?.35:e.type==="back"?.22:.16));
-  const kg=Math.max(1,Math.round(base*levelFactor/2.5)*2.5);
-  const sets=p.level==="beginner"?2:goalSets;
-  return {...e,sets,reps:goalReps,rest,weight:`${kg} кг*`};
+ const byId=id=>available.find(e=>e.id===id);
+ const templates={
+  1:[["Тренировка — всё тело",["bench","latpull","squat","shoulder","hipthrust","plank"]]],
+  2:[["Тренировка A — всё тело",["bench","row","squat","lateral","plank"]],["Тренировка B — всё тело",["legpress","latpull","inclinepress","hipthrust","curl","cablecrunch"]]],
+  3:[["День 1 — Всё тело A",["bench","latpull","legpress","shoulder","plank"]],["День 2 — Всё тело B",["squat","row","inclinepress","hipthrust","curl"]],["День 3 — Всё тело C",["chestpress","assistedpullup","legcurl","lateral","cablecrunch"]]],
+  4:[["День 1 — Верх тела A",["bench","latpull","shoulder","curl","tricepspushdown"]],["День 2 — Низ тела A",["squat","legpress","legcurl","calfraise","plank"]],["День 3 — Верх тела B",["inclinepress","row","facepull","cablefly","overheadtriceps"]],["День 4 — Низ тела B",["rdl","hipthrust","legextension","adductor","standingcalf"]]],
+  5:[["День 1 — Жимовые мышцы",["bench","inclinepress","shoulder","cablefly","overheadtriceps"]],["День 2 — Тяговые мышцы",["latpull","row","facepull","curl","cablecurl"]],["День 3 — Ноги",["squat","legpress","rdl","legcurl","calfraise"]],["День 4 — Верх тела",["chestpress","assistedpullup","lateral","tricepspushdown","cablecrunch"]],["День 5 — Низ тела и ягодицы",["hipthrust","hacksquat","legextension","hipabduction","standingcalf"]]],
+  6:[["День 1 — Жим A",["bench","shoulder","cablefly","tricepspushdown"]],["День 2 — Тяга A",["latpull","row","facepull","curl"]],["День 3 — Ноги A",["squat","rdl","calfraise","plank"]],["День 4 — Жим B",["inclinepress","chestpress","lateral","overheadtriceps"]],["День 5 — Тяга B",["assistedpullup","backextension","cablecurl","cablecrunch"]],["День 6 — Ноги B",["legpress","hipthrust","legcurl","legextension","standingcalf"]]]
+ };
+ const count=Math.min(6,Math.max(1,Number(p.daysPerWeek)||3));
+ let groups=templates[count].map(([name,ids])=>[name,ids.filter(id=>byId(id))]);
+ const zoneExercises={chest:["bench","chestpress","pecdeck","cablefly","inclinepress"],back:["latpull","row","assistedpullup","facepull","backextension"],shoulders:["shoulder","lateral","facepull"],arms:["curl","tricepspushdown","cablecurl","overheadtriceps"],abdomen:["plank","cablecrunch"],glutes:["hipabduction","squat","legpress","smithsquat","hipthrust","rdl"],thighs:["squat","legpress","legextension","legcurl","smithsquat","rdl","hacksquat","adductor"],calves:["calfraise","standingcalf"]};
+ const focusIds=[...new Set((p.problemZones||[]).flatMap(z=>zoneExercises[z]||[]))].filter(id=>byId(id));
+ const already=new Set(groups.flatMap(g=>g[1]));
+ focusIds.filter(id=>!already.has(id)).forEach((id,index)=>groups[index%groups.length][1].push(id));
+ const levelFactor={beginner:.4,intermediate:.55,advanced:.65}[p.level]||.5;
+ const goalSets={fat:3,mass:4,tone:3,maintain:2}[p.goal]||3;
+ const goalReps={fat:"12–15",mass:"6–12",tone:"10–15",maintain:"8–12"}[p.goal]||"10–12";
+ const rest={fat:60,mass:120,tone:60,maintain:90}[p.goal]||90;
+ const days=groups.map(([name,ids])=>({name,items:[...new Set(ids)].map(id=>byId(id)).filter(Boolean).map(e=>{
+  const factor=(e.type==="legs"||e.type==="glutes")?.30:(e.type==="back"?.18:.13);
+  const kg=Math.max(1,Math.round(p.weight*factor*levelFactor/2.5)*2.5);
+  return {...e,sets:p.level==="beginner"?2:goalSets,reps:goalReps,rest,weight:e.machine==="Собственный вес"?"Собственный вес":kg+" кг*"};
  })}));
- return {title:`Программа: ${({fat:"Похудение",mass:"Набор массы",tone:"Рельеф",maintain:"Поддержание формы"})[p.goal]}`,profile:p,days,created:new Date().toLocaleDateString("ru-RU"),note:"* Оценка стартового рабочего веса условная. Начни с лёгкого веса, оставляй 2–3 повтора в запасе и корректируй нагрузку по технике и самочувствию."};
+ return {title:"Программа: "+({fat:"Похудение",mass:"Набор массы",tone:"Рельеф",maintain:"Поддержание формы"})[p.goal],profile:p,days,created:new Date().toLocaleDateString("ru-RU"),note:"* Оценка стартового веса условная. Начни с лёгкой нагрузки, оставляй 2–3 повтора в запасе и корректируй вес по технике и самочувствию. Между силовыми днями одной группы оставляй время на восстановление."};
 }
 $("#profileForm").addEventListener("submit",e=>{
  e.preventDefault();
- const p={sex:$("#sex").value,age:+$("#age").value,weight:+$("#weight").value,height:+$("#height").value,level:$("#level").value,goal:$("#goal").value,equipment:getSelectedEquipment(),problemZones:$$("input[name=\"problemZone\"]:checked").map(x=>x.value)};
+ const p={sex:$("#sex").value,age:+$("#age").value,weight:+$("#weight").value,height:+$("#height").value,level:$("#level").value,goal:$("#goal").value,equipment:getSelectedEquipment(),problemZones:$("input[name=\"problemZone\"]:checked").map(x=>x.value),daysPerWeek:+$("#daysPerWeek").value};
  if(!p.equipment.length){alert("Выбери хотя бы один вариант инвентаря.");return;}
  if(p.age<14||p.age>90||p.weight<35||p.weight>250||p.height<130||p.height>220){alert("Проверь введённые параметры.");return;}
  lastGenerated=buildProgram(p);renderGenerated(lastGenerated);
