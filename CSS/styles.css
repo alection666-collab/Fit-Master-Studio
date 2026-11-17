@@ -53,3 +53,34 @@ body{font-size:16px}
 
 /* Inline exercise SVG: works without external image hosts or data URLs */
 .exercise-visual{width:100%;height:100%;display:block;overflow:hidden;background:#25332a}.exercise-inline-svg{display:block;width:100%;height:100%;object-fit:cover}.exercise-visual.modal-image{height:260px;margin:0 0 20px;border-radius:12px;overflow:hidden}
+
+/* v1.8 — анимация техники и подсветка активных мышц */
+.exercise-visual{height:100%;min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:5px 8px 8px;background:radial-gradient(ellipse at 50% 45%,#35483b 0%,#1c2a22 72%);overflow:hidden}
+.exercise-inline-svg{width:100%;height:100%}
+.motion-stage{width:100%;height:128px;display:grid;place-items:center}
+.anatomy{height:100%;max-width:100%;overflow:visible}
+.anatomy .torso{fill:#9aa89d;stroke:#d9e1da;stroke-width:1.4}
+.anatomy .limbs{stroke:#aab6ac}
+.anatomy .hot{fill:#ff684f;stroke:#ffb19f;stroke-width:1;opacity:.95;filter:drop-shadow(0 0 5px #ff563e);animation:musclePulse 1.15s ease-in-out infinite alternate}
+.anatomy .prop{fill:none;stroke:#a8b9ad;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;opacity:.72}
+.anatomy .water{stroke:#4bc7dc;stroke-width:3}
+.muscle-caption{display:flex;align-items:center;gap:7px;max-width:100%;color:#ffb5a7;font-size:10px;font-weight:700;text-align:center;line-height:1.25;padding:4px 2px}
+.muscle-caption .pulse-dot{flex:0 0 7px;width:7px;height:7px;border-radius:50%;background:#ff684f;box-shadow:0 0 9px #ff684f;animation:musclePulse .8s infinite alternate}
+.motion-chest .body{transform-origin:100px 110px;animation:pressMove 2s ease-in-out infinite}
+.motion-back .body{transform-origin:100px 95px;animation:rowMove 2s ease-in-out infinite}
+.motion-legs .body{transform-origin:100px 130px;animation:squatMove 2.2s ease-in-out infinite}
+.motion-shoulders .body{transform-origin:100px 85px;animation:raiseMove 2s ease-in-out infinite}
+.motion-arms .body{transform-origin:100px 85px;animation:curlMove 1.8s ease-in-out infinite}
+.motion-core .body{transform-origin:100px 110px;animation:coreMove 2.2s ease-in-out infinite}
+.motion-pool .body{transform-origin:100px 110px;animation:swimMove 2.2s ease-in-out infinite}
+@keyframes musclePulse{from{opacity:.48}to{opacity:1}}
+@keyframes pressMove{0%,100%{transform:translateY(5px) scaleY(.97)}50%{transform:translateY(-5px) scaleY(1.02)}}
+@keyframes rowMove{0%,100%{transform:translateX(-4px)}50%{transform:translateX(5px)}}
+@keyframes squatMove{0%,100%{transform:translateY(-2px) scaleY(1)}50%{transform:translateY(12px) scaleY(.91)}}
+@keyframes raiseMove{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(5deg)}}
+@keyframes curlMove{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(5deg)}}
+@keyframes coreMove{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+@keyframes swimMove{0%,100%{transform:translateY(2px) rotate(-3deg)}50%{transform:translateY(-4px) rotate(3deg)}}
+@media(prefers-reduced-motion:reduce){.anatomy .hot,.muscle-caption .pulse-dot,.motion-stage .body{animation:none!important}}
+@media(max-width:700px){.motion-stage{height:100px}.muscle-caption{font-size:9px}}
+.modal-image .motion-stage{height:210px}
