@@ -73,7 +73,7 @@ function exerciseVisual(e, extraClass=""){
  const imageFile=e.id==="plank"?"hold.webp":"start.webp";
  const endAttr=e.id==="plank"?"":' data-end="'+imageBase+'end.webp"';
  const photo=imageId?'<img class="exercise-photo" src="'+imageBase+imageFile+'"'+endAttr+' alt="Техника: '+safe(e.name)+'" loading="lazy" decoding="async">':'';
- return '<div data-muscle-group="'+muscleGroup+'" class="exercise-visual '+extraClass+' exercise-'+safe(e.id)+'">'+photo+'<div class="exercise-vector-fallback"><svg class="anatomy side-anatomy exercise-inline-svg" viewBox="0 0 200 210" role="img" aria-label="Схема упражнения '+safe(e.name)+'. Работающие мышцы: '+safe(muscleNames)+'"><g class="machine-props">'+gear+'</g><g class="body">'+p.body+p.hot+'</g></svg></div><div class="muscle-caption"><span class="pulse-dot"></span><span class="primary-muscle">'+safe(primaryMuscle)+'</span><span class="secondary-muscles">'+safe((e.muscles||[]).slice(1,3).join(" · "))+'</span></div></div>';
+ return '<div data-muscle-group="'+muscleGroup+'" class="exercise-visual '+extraClass+' exercise-'+safe(e.id)+'">'+photo+'<div class="image-loading">Загрузка изображения</div><div class="muscle-caption"><span class="pulse-dot"></span><span class="primary-muscle">'+safe(primaryMuscle)+'</span><span class="secondary-muscles">'+safe((e.muscles||[]).slice(1,3).join(" · "))+'</span></div></div>';
 }
 
 // Надёжная загрузка иллюстраций: основной raw GitHub + резервный jsDelivr.
@@ -88,7 +88,7 @@ function mountExerciseMedia(root=document){
   let failedHosts=0, showingEnd=false, timer=null;
   const card=img.closest(".exercise-visual");
   img.addEventListener("load",()=>{
-   card.classList.add("media-loaded");
+   card.classList.add("media-loaded");\n   const status=card.querySelector(".image-loading");if(status)status.remove();
    if(!timer && endRaw){timer=setInterval(()=>{
     showingEnd=!showingEnd;
     img.src=(showingEnd?endRaw:raw);
@@ -96,7 +96,7 @@ function mountExerciseMedia(root=document){
   });
   img.addEventListener("error",()=>{
    if(failedHosts===0){failedHosts=1;img.src=cdn(showingEnd?endRaw:raw);}
-   else {if(timer)clearInterval(timer);img.remove();card.classList.remove("media-loaded");}
+   else {if(timer)clearInterval(timer);img.remove();card.classList.remove("media-loaded");const status=card.querySelector(".image-loading");if(status)status.textContent="Загрузка изображения";}
   });
   if(img.complete && img.naturalWidth)img.dispatchEvent(new Event("load"));
  });
