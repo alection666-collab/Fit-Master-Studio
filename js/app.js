@@ -68,11 +68,9 @@ function exerciseVisual(e, extraClass=""){
  const p=poses[e.id]||poses.plank;
  const gear=equipment[e.id]||'<path class="prop" d="M28 180H172"/>';
  const EXERCISE_IMAGE_MAP={"plank":"plank","tricepspushdown":"tricep-pushdowns","bench":"bench-press","chestpress":"chest-press-machine","latpull":"lat-pulldown","row":"seated-cable-row","squat":"goblet-squat","legpress":"leg-press","shoulder":"dumbbell-shoulder-press","lateral":"lateral-raises","curl":"biceps-curl","legextension":"leg-extension","legcurl":"leg-curl","hipabduction":"hip-abduction-machine","pecdeck":"pec-deck","smithsquat":"smith-machine-squat","assistedpullup":"assisted-pull-up","calfraise":"seated-calf-raise","rdl":"romanian-deadlift","hipthrust":"hip-thrust-machine","cablefly":"cable-crossover","inclinepress":"incline-dumbbell-press","facepull":"face-pulls","cablecurl":"cable-curl","overheadtriceps":"overhead-triceps-extension","hacksquat":"hack-squat","adductor":"hip-adduction-machine","backextension":"back-extensions","standingcalf":"standing-calf-raise-machine","cablecrunch":"cable-crunch"};
- const imageId=EXERCISE_IMAGE_MAP[e.id];
- const imageBase=imageId?'https://raw.githubusercontent.com/MarvinNazari/exercise-images/main/images/'+imageId+'/':'';
- const imageFile=e.id==="plank"?"hold.webp":"start.webp";
- const endAttr=e.id==="plank"?"":' data-end="'+imageBase+'end.webp"';
- const photo=imageId?'<img class="exercise-photo" style="position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:contain!important;opacity:1!important;visibility:visible!important;display:block!important;z-index:3!important;background:#101114" src="'+imageBase+imageFile+'"'+endAttr+' alt="Техника: '+safe(e.name)+'" loading="eager" decoding="async">':'';
+ const imageFile=e.id+".jpg";
+ const imageUrl="assets/exercises/"+imageFile;
+ const photo='<img class="exercise-photo" style="position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:contain!important;opacity:1!important;visibility:visible!important;display:block!important;z-index:3!important;background:#101114" src="'+imageUrl+'" alt="Техника: '+safe(e.name)+'" loading="eager" decoding="async">';
  return '<div data-muscle-group="'+muscleGroup+'" class="exercise-visual '+extraClass+' exercise-'+safe(e.id)+'">'+photo+'<div class="muscle-caption"><span class="pulse-dot"></span><span class="primary-muscle">'+safe(primaryMuscle)+'</span><span class="secondary-muscles">'+safe((e.muscles||[]).slice(1,3).join(" · "))+'</span></div></div>';
 }
 
@@ -83,35 +81,16 @@ function mountExerciseMedia(root=document){
   if(img.dataset.mediaBound)return;
   img.dataset.mediaBound="1";
   const raw=img.getAttribute("src");
-  const endRaw=img.dataset.end;
-  const cdn=u=>u.replace("https://raw.githubusercontent.com/MarvinNazari/exercise-images/main/","https://cdn.jsdelivr.net/gh/MarvinNazari/exercise-images@main/");
   const card=img.closest(".exercise-visual");
-  let activeUrl=raw, showingEnd=false, timer=null, hostFallback=false;
-  const stop=()=>{if(timer){clearInterval(timer);timer=null;}};
-  const show=(url)=>{activeUrl=url;img.src=url;};
   img.addEventListener("load",()=>{
-   if(img.naturalWidth>0){
-    card.classList.add("media-loaded");
-    if(!timer && endRaw){timer=setInterval(()=>{
-     showingEnd=!showingEnd;
-     show(showingEnd?endRaw:raw);
-    },2200);}
-   }
+   if(img.naturalWidth>0) card.classList.add("media-loaded");
   });
   img.addEventListener("error",()=>{
-   if(!hostFallback){
-    hostFallback=true;
-    show(cdn(activeUrl));
-   }else{
-    stop();
-    card.classList.remove("media-loaded");
-    const note=card.querySelector(".image-loading");
-    if(note)note.textContent="Не удалось загрузить фото";
-   }
+   card.classList.remove("media-loaded");
   });
-  // Сбрасываем ранний запрос из HTML и запускаем его только после установки обработчиков.
+  // Повторный запуск после установки обработчиков исключает гонку загрузки.
   img.removeAttribute("src");
-  show(raw);
+  img.setAttribute("src",raw);
  });
 }
 
