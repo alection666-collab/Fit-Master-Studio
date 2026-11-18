@@ -88,7 +88,8 @@ function mountExerciseMedia(root=document){
   let failedHosts=0, showingEnd=false, timer=null;
   const card=img.closest(".exercise-visual");
   img.addEventListener("load",()=>{
-   card.classList.add("media-loaded");\n   const status=card.querySelector(".image-loading");if(status)status.remove();
+   card.classList.add("media-loaded");
+   const status=card.querySelector(".image-loading");if(status)status.remove();
    if(!timer && endRaw){timer=setInterval(()=>{
     showingEnd=!showingEnd;
     img.src=(showingEnd?endRaw:raw);
