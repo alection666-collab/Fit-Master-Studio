@@ -72,7 +72,7 @@ function exerciseVisual(e, extraClass=""){
  const imageBase=imageId?'https://raw.githubusercontent.com/MarvinNazari/exercise-images/main/images/'+imageId+'/':'';
  const imageFile=e.id==="plank"?"hold.webp":"start.webp";
  const endAttr=e.id==="plank"?"":' data-end="'+imageBase+'end.webp"';
- const photo=imageId?'<img class="exercise-photo" src="'+imageBase+imageFile+'"'+endAttr+' alt="Техника: '+safe(e.name)+'" loading="lazy" decoding="async">':'';
+ const photo=imageId?'<img class="exercise-photo" data-src="'+imageBase+imageFile+'"'+endAttr+' alt="Техника: '+safe(e.name)+'" loading="lazy" decoding="async">':'';
  return '<div data-muscle-group="'+muscleGroup+'" class="exercise-visual '+extraClass+' exercise-'+safe(e.id)+'">'+photo+'<div class="image-loading">Загрузка изображения</div><div class="muscle-caption"><span class="pulse-dot"></span><span class="primary-muscle">'+safe(primaryMuscle)+'</span><span class="secondary-muscles">'+safe((e.muscles||[]).slice(1,3).join(" · "))+'</span></div></div>';
 }
 
@@ -82,24 +82,24 @@ function mountExerciseMedia(root=document){
  root.querySelectorAll(".exercise-photo").forEach(img=>{
   if(img.dataset.mediaBound)return;
   img.dataset.mediaBound="1";
-  const raw=img.getAttribute("src");
-  const endRaw=img.dataset.end;
-  const cdn=u=>u.replace("https://raw.githubusercontent.com/MarvinNazari/exercise-images/main/","https://cdn.jsdelivr.net/gh/MarvinNazari/exercise-images@main/");
-  let failedHosts=0, showingEnd=false, timer=null;
+  const raw=img.dataset.src||img.getAttribute("src");
+  const endRaw=img.dataset.end||"";
+  const toCdn=u=>u.replace("https://raw.githubusercontent.com/MarvinNazari/exercise-images/main/","https://cdn.jsdelivr.net/gh/MarvinNazari/exercise-images@main/");
+  const toRaw=u=>u.replace("https://cdn.jsdelivr.net/gh/MarvinNazari/exercise-images@main/","https://raw.githubusercontent.com/MarvinNazari/exercise-images/main/");
+  let host="cdn", showingEnd=false, timer=null, fallbackTried=false;
   const card=img.closest(".exercise-visual");
+  const url=(whichEnd,whichHost)=>{const u=whichEnd&&endRaw?endRaw:raw;return whichHost==="cdn"?toCdn(u):toRaw(u);};
   img.addEventListener("load",()=>{
    card.classList.add("media-loaded");
    const status=card.querySelector(".image-loading");if(status)status.remove();
-   if(!timer && endRaw){timer=setInterval(()=>{
-    showingEnd=!showingEnd;
-    img.src=(showingEnd?endRaw:raw);
-   },1700);}
+   if(!timer && endRaw){timer=setInterval(()=>{showingEnd=!showingEnd;img.src=url(showingEnd,host);},2400);}
   });
   img.addEventListener("error",()=>{
-   if(failedHosts===0){failedHosts=1;img.src=cdn(showingEnd?endRaw:raw);}
-   else {if(timer)clearInterval(timer);img.remove();card.classList.remove("media-loaded");const status=card.querySelector(".image-loading");if(status)status.textContent="Загрузка изображения";}
+   if(!fallbackTried){fallbackTried=true;host="raw";img.src=url(showingEnd,host);}
+   else{if(timer)clearInterval(timer);img.remove();card.classList.remove("media-loaded");const status=card.querySelector(".image-loading");if(status)status.textContent="Загрузка изображения";}
   });
-  if(img.complete && img.naturalWidth)img.dispatchEvent(new Event("load"));
+  // Обработчики ставятся до src, чтобы не пропустить быстрый ответ или ошибку кэша.
+  img.src=url(false,host);
  });
 }
 
