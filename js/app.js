@@ -85,20 +85,33 @@ function mountExerciseMedia(root=document){
   const raw=img.getAttribute("src");
   const endRaw=img.dataset.end;
   const cdn=u=>u.replace("https://raw.githubusercontent.com/MarvinNazari/exercise-images/main/","https://cdn.jsdelivr.net/gh/MarvinNazari/exercise-images@main/");
-  let failedHosts=0, showingEnd=false, timer=null;
   const card=img.closest(".exercise-visual");
+  let activeUrl=raw, showingEnd=false, timer=null, hostFallback=false;
+  const stop=()=>{if(timer){clearInterval(timer);timer=null;}};
+  const show=(url)=>{activeUrl=url;img.src=url;};
   img.addEventListener("load",()=>{
-   card.classList.add("media-loaded");
-   if(!timer && endRaw){timer=setInterval(()=>{
-    showingEnd=!showingEnd;
-    img.src=(showingEnd?endRaw:raw);
-   },1700);}
+   if(img.naturalWidth>0){
+    card.classList.add("media-loaded");
+    if(!timer && endRaw){timer=setInterval(()=>{
+     showingEnd=!showingEnd;
+     show(showingEnd?endRaw:raw);
+    },2200);}
+   }
   });
   img.addEventListener("error",()=>{
-   if(failedHosts===0){failedHosts=1;img.src=cdn(showingEnd?endRaw:raw);}
-   else {if(timer)clearInterval(timer);img.remove();card.classList.remove("media-loaded");}
+   if(!hostFallback){
+    hostFallback=true;
+    show(cdn(activeUrl));
+   }else{
+    stop();
+    card.classList.remove("media-loaded");
+    const note=card.querySelector(".image-loading");
+    if(note)note.textContent="Не удалось загрузить фото";
+   }
   });
-  if(img.complete && img.naturalWidth)img.dispatchEvent(new Event("load"));
+  // Сбрасываем ранний запрос из HTML и запускаем его только после установки обработчиков.
+  img.removeAttribute("src");
+  show(raw);
  });
 }
 
