@@ -84,22 +84,25 @@ function mountExerciseMedia(root=document){
   img.dataset.mediaBound="1";
   const raw=img.dataset.src||img.getAttribute("src");
   const endRaw=img.dataset.end||"";
-  const toCdn=u=>u.replace("https://raw.githubusercontent.com/MarvinNazari/exercise-images/main/","https://cdn.jsdelivr.net/gh/MarvinNazari/exercise-images@main/");
-  const toRaw=u=>u.replace("https://cdn.jsdelivr.net/gh/MarvinNazari/exercise-images@main/","https://raw.githubusercontent.com/MarvinNazari/exercise-images/main/");
-  let host="cdn", showingEnd=false, timer=null, fallbackTried=false;
+  const mirrors=[
+   u=>u.replace("https://raw.githubusercontent.com/MarvinNazari/exercise-images/main/","https://raw.githack.com/MarvinNazari/exercise-images/main/"),
+   u=>u.replace("https://raw.githubusercontent.com/MarvinNazari/exercise-images/main/","https://cdn.jsdelivr.net/gh/MarvinNazari/exercise-images@main/"),
+   u=>u,
+   u=>"https://ghproxy.net/"+u
+  ];
+  let mirrorIndex=0, showingEnd=false, timer=null;
   const card=img.closest(".exercise-visual");
-  const url=(whichEnd,whichHost)=>{const u=whichEnd&&endRaw?endRaw:raw;return whichHost==="cdn"?toCdn(u):toRaw(u);};
+  const source=(end)=>{const u=end&&endRaw?endRaw:raw;return mirrors[mirrorIndex](u);};
   img.addEventListener("load",()=>{
    card.classList.add("media-loaded");
    const status=card.querySelector(".image-loading");if(status)status.remove();
-   if(!timer && endRaw){timer=setInterval(()=>{showingEnd=!showingEnd;img.src=url(showingEnd,host);},2400);}
+   if(!timer&&endRaw){timer=setInterval(()=>{showingEnd=!showingEnd;img.src=source(showingEnd);},2600);}
   });
   img.addEventListener("error",()=>{
-   if(!fallbackTried){fallbackTried=true;host="raw";img.src=url(showingEnd,host);}
-   else{if(timer)clearInterval(timer);img.remove();card.classList.remove("media-loaded");const status=card.querySelector(".image-loading");if(status)status.textContent="Загрузка изображения";}
+   if(mirrorIndex<mirrors.length-1){mirrorIndex++;img.src=source(showingEnd);}
+   else{if(timer)clearInterval(timer);img.remove();card.classList.remove("media-loaded");const status=card.querySelector(".image-loading");if(status)status.textContent="Изображение временно недоступно";}
   });
-  // Обработчики ставятся до src, чтобы не пропустить быстрый ответ или ошибку кэша.
-  img.src=url(false,host);
+  img.src=source(false);
  });
 }
 
