@@ -274,3 +274,19 @@ body{font-size:16px}
 .recommended-media .exercise-visual{min-height:190px!important}
 .exercise-visual .exercise-vector-fallback{display:none!important}
 @media(max-width:700px){.exercise-image{height:210px}.recommended-media .exercise-visual{min-height:185px!important}}
+
+
+/* FIT MASTER v3.8 — фото видны независимо от JS-события load */
+.exercise-visual .exercise-photo{
+  opacity:1!important;
+  visibility:visible!important;
+  display:block!important;
+}
+.exercise-visual .image-loading{
+  pointer-events:none!important;
+  z-index:0!important;
+  background:transparent!important;
+  color:transparent!important;
+}
+.exercise-visual.media-loaded .image-loading{display:none!important}
+.exercise-visual .exercise-photo{z-index:2!important}
