@@ -72,8 +72,8 @@ function exerciseVisual(e, extraClass=""){
  const imageBase=imageId?'https://raw.githubusercontent.com/MarvinNazari/exercise-images/main/images/'+imageId+'/':'';
  const imageFile=e.id==="plank"?"hold.webp":"start.webp";
  const endAttr=e.id==="plank"?"":' data-end="'+imageBase+'end.webp"';
- const photo=imageId?'<img class="exercise-photo" src="'+imageBase+imageFile+'"'+endAttr+' alt="Техника: '+safe(e.name)+'" loading="lazy" decoding="async">':'';
- return '<div data-muscle-group="'+muscleGroup+'" class="exercise-visual '+extraClass+' exercise-'+safe(e.id)+'">'+photo+'<div class="image-loading">Загрузка изображения</div><div class="muscle-caption"><span class="pulse-dot"></span><span class="primary-muscle">'+safe(primaryMuscle)+'</span><span class="secondary-muscles">'+safe((e.muscles||[]).slice(1,3).join(" · "))+'</span></div></div>';
+ const photo=imageId?'<img class="exercise-photo" style="position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:contain!important;opacity:1!important;visibility:visible!important;display:block!important;z-index:3!important;background:#101114" src="'+imageBase+imageFile+'"'+endAttr+' alt="Техника: '+safe(e.name)+'" loading="eager" decoding="async">':'';
+ return '<div data-muscle-group="'+muscleGroup+'" class="exercise-visual '+extraClass+' exercise-'+safe(e.id)+'">'+photo+'<div class="muscle-caption"><span class="pulse-dot"></span><span class="primary-muscle">'+safe(primaryMuscle)+'</span><span class="secondary-muscles">'+safe((e.muscles||[]).slice(1,3).join(" · "))+'</span></div></div>';
 }
 
 // Надёжная загрузка иллюстраций: основной raw GitHub + резервный jsDelivr.
